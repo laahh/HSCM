@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import BerauCoalLogo from "@/components/brand/BerauCoalLogo";
 import {
   PILLARS,
   PLAYERS_META,
@@ -75,16 +76,7 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
         <div className="mx-auto max-w-[1600px]">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div
-                className="grid h-11 w-11 place-items-center rounded-xl border bg-white shadow-sm"
-                style={{ borderColor: "rgba(15, 92, 46, 0.18)" }}
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="var(--tb-green-deep)" strokeWidth="2">
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M12 3v18M3 12h18" opacity="0.35" />
-                  <circle cx="12" cy="12" r="2.5" fill="var(--lime)" stroke="none" />
-                </svg>
-              </div>
+              <BerauCoalLogo height={44} className="rounded-md bg-white" />
               <div>
                 <div className="mono text-[11px] tracking-[0.25em] text-emerald-700">HSECM TINGKAT I</div>
                 <div className="font-heading text-sm font-semibold text-slate-800">

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
+import BerauCoalLogo from "../brand/BerauCoalLogo";
 import ColorDots from "./ColorDots";
 import BrandBar from "./BrandBar";
 import ParallaxBackground from "./ParallaxBackground";
@@ -37,13 +38,10 @@ export default function Hero() {
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: EASE_OUT }}
-          className="glass-chip flex items-center gap-3 rounded-2xl px-4 py-2.5"
+          className="glass-chip flex items-center gap-3 rounded-2xl px-3 py-2 sm:gap-3.5 sm:px-4 sm:py-2.5"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--green-deep)]">
-            <svg width="18" height="18" viewBox="0 0 28 28" fill="none" aria-hidden>
-              <path d="M14 2c4 4 4 9 0 13-4-4-4-9 0-13Z" fill="var(--lime)" />
-            </svg>
-          </span>
+          <BerauCoalLogo height={40} priority className="rounded-md bg-white/90 p-0.5" />
+          <div className="h-8 w-px shrink-0 bg-[var(--ink)]/15" aria-hidden />
           <div className="leading-tight">
             <p className="font-heading text-sm font-extrabold uppercase tracking-wide text-[var(--ink)]">
               HSECM Tingkat I
@@ -70,29 +68,20 @@ export default function Hero() {
 
           <motion.h1
             variants={item}
-            className="font-heading text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-[var(--ink)] sm:text-5xl lg:text-6xl"
+            className="font-heading text-5xl font-extrabold leading-[1.02] tracking-tight text-[var(--ink)] sm:text-6xl lg:text-7xl"
           >
-            Enhancing
+            Mengubah Ketidakpastian
             <br />
-            Operation-HSE
-            <br />
-            Performance
+            Menjadi Keunggulan
           </motion.h1>
 
           <motion.p
             variants={item}
-            className="max-w-md font-body text-sm leading-relaxed text-[var(--ink-soft)] sm:text-base"
+            className="max-w-xl font-body text-base leading-relaxed text-[var(--ink-soft)] sm:text-lg"
           >
-            Through Reflection, Accountability, and Improvement.
-          </motion.p>
-
-          <motion.p
-            variants={item}
-            className="font-heading text-2xl font-bold italic leading-snug sm:text-3xl"
-          >
-            <span className="text-gradient-gold underline decoration-4 underline-offset-4">
-              Paham Kondisi, Berani Intropeksi, Bangkit Lebih Kuat
-            </span>
+            Kolaborasi Membangun Organisasi Berkinerja Tinggi untuk Stabilitas
+            dan Meningkatkan Daya Saing melalui Disiplin Operasional, Perbaikan
+            Berkelanjutan dan Inovasi.
           </motion.p>
         </motion.div>
 

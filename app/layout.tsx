@@ -17,7 +17,7 @@ const rubik = Rubik({
 export const metadata: Metadata = {
   title: "HSECM Tingkat I — Quarter 2 2026",
   description:
-    "Enhancing Operation-HSE Performance through Reflection, Accountability, and Improvement — Paham Kondisi, Berani Intropeksi, Bangkit Lebih Kuat.",
+    "Mengubah Ketidakpastian Menjadi Keunggulan: Kolaborasi Membangun Organisasi Berkinerja Tinggi untuk Stabilitas dan Meningkatkan Daya Saing melalui Disiplin Operasional, Perbaikan Berkelanjutan dan Inovasi.",
 };
 
 export default function RootLayout({

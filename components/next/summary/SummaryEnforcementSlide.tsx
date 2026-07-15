@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import BerauCoalLogo from "../../brand/BerauCoalLogo";
 import { PILLARS, TACTICS } from "../system-defender/tactical/data";
 import { TACTIC_CARDS } from "../safety-performance/data";
 import { ENFORCEMENT, SUMMARY_CARDS, SUMMARY_QUOTE, type SummaryCard } from "./data";
@@ -224,7 +225,7 @@ export default function SummaryEnforcementSlide({ onBack }: Props) {
 
           <div className="order-3 text-center md:order-2">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-              HSECM Tingkat I · Q2 2026 · PT Berau Coal
+              HSECM Tingkat I · Q2 2026
             </div>
             <h1 className="mt-1 font-heading text-xl font-black leading-tight text-[color:var(--ink)] md:text-2xl lg:text-[26px]">
               Highlight Summary &amp; Enforcement
@@ -238,9 +239,8 @@ export default function SummaryEnforcementSlide({ onBack }: Props) {
             <span className="rounded-full bg-red-600 px-3 py-1.5 text-[11px] font-bold tracking-wide text-white shadow-md">
               #SiagaSalingMenjaga
             </span>
-            <div className="border-l border-slate-200 pl-3 text-right leading-tight">
-              <div className="text-lg font-black tracking-tight text-[color:var(--ink)]">beraucoal</div>
-              <div className="text-[10px] italic text-[color:var(--ink-soft)]">bergerak lebih maju</div>
+            <div className="border-l border-slate-200 pl-3">
+              <BerauCoalLogo height={36} />
             </div>
           </div>
         </motion.header>
@@ -331,8 +331,11 @@ export default function SummaryEnforcementSlide({ onBack }: Props) {
         </div>
 
         <footer className="mt-6 py-4 text-center text-[11px] text-[color:var(--ink-soft)]">
-          PT Berau Coal · HSECM Tingkat I · Q2 2026 ·{" "}
-          <span className="font-semibold text-[color:var(--green-mid)]">#SiagaSalingMenjaga</span>
+          <span className="inline-flex items-center justify-center gap-2">
+            <BerauCoalLogo height={18} />
+            <span>· HSECM Tingkat I · Q2 2026 ·</span>
+            <span className="font-semibold text-[color:var(--green-mid)]">#SiagaSalingMenjaga</span>
+          </span>
         </footer>
       </div>
     </div>

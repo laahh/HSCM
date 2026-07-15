@@ -104,11 +104,13 @@ export default function SpotlightReveal({ onContinue }: { onContinue: () => void
         <p className="font-heading text-sm font-extrabold uppercase tracking-[0.2em] text-[var(--ink)]">
           HSECM Tingkat I &middot; Quarter 2 2026
         </p>
-        <h1 className="max-w-3xl font-heading text-4xl font-extrabold uppercase leading-[0.95] text-[var(--ink)] sm:text-6xl">
-          Bangkit Lebih Kuat
+        <h1 className="max-w-3xl font-heading text-5xl font-extrabold leading-[1.05] text-[var(--ink)] sm:text-5xl">
+          Mengubah Ketidakpastian Menjadi Keunggulan
         </h1>
-        <p className="max-w-md font-body text-sm text-[var(--ink-soft)] sm:text-base">
-          Paham Kondisi, Berani Intropeksi, Bangkit Lebih Kuat.
+        <p className="max-w-2xl font-body text-sm text-[var(--ink-soft)] sm:text-base">
+          Kolaborasi Membangun Organisasi Berkinerja Tinggi untuk Stabilitas dan
+          Meningkatkan Daya Saing melalui Disiplin Operasional, Perbaikan
+          Berkelanjutan dan Inovasi.
         </p>
       </div>
 

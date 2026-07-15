@@ -10,25 +10,10 @@ export default function BrandBar() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="flex items-center gap-2">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden>
-          <path
-            d="M14 2c4 4 4 9 0 13-4-4-4-9 0-13Z"
-            fill="var(--dot-2)"
-          />
-          <path
-            d="M14 9c4 4 4 9 0 13-4-4-4-9 0-13Z"
-            fill="var(--dot-1)"
-          />
-        </svg>
-        <div className="leading-tight">
-          <p className="font-heading text-lg font-bold text-white">
-            beraucoal
-          </p>
-          <p className="text-[10px] tracking-wide text-white/60">
-            better energy, brighter future
-          </p>
-        </div>
+      <div className="leading-tight">
+        <p className="font-heading text-lg font-extrabold uppercase tracking-[0.14em] text-white sm:text-xl">
+          OHS Division
+        </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

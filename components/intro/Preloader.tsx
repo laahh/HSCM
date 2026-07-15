@@ -4,14 +4,15 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const TAGS = [
-  "#HSECM TINGKAT I",
-  "#PAHAM KONDISI",
-  "#BERANI INTROPEKSI",
-  "#BANGKIT LEBIH KUAT",
-  "#SIAGA SALING MENJAGA",
+  "#KOLABORASI",
+  "#STABILITAS",
+  "#MENINGKATKANDAYASAING",
+  "#DISIPLINOPERASIONAL",
+  "#PERBAIKANBERKELANJUTAN",
+  "#INOVASI",
 ];
 
-const TAG_COLORS = ["#0b3d1f", "#2f5a3d", "#e8632c", "#0b3d1f", "#1f8a44"];
+const TAG_COLORS = ["#0b3d1f", "#2f5a3d", "#e8632c", "#0b3d1f", "#1f8a44", "#c9982f"];
 
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [progress, setProgress] = useState(0);

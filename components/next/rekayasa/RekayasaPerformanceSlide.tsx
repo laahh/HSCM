@@ -21,227 +21,200 @@ const KPIS = [
   {
     value: "67%",
     tone: "bad" as const,
-    label: "(22/33) Group Aktivitas Tercover Pengendalian Risiko Rekayasa",
+    sub: "(22/33)",
+    label: "Group Aktivitas Tercover Pengendalian Risiko Rekayasa",
   },
   {
     value: "89%",
     tone: "bad" as const,
-    label: "(239/270) Pengendalian Risiko Rekayasa menyisakan Residual Risk",
+    sub: "(239/270)",
+    label: "Pengendalian Risiko Rekayasa menyisakan Residual Risk",
   },
 ];
 
-const TECH = [
-  {
-    title: "Remote Pump",
-    src: "/rekayasa-pump-ba.png",
-    extra: "/rekayasa-pump-steps.png",
-    dual: true,
-  },
-  {
-    title: "Remote Dozer",
-    src: "/rekayasa-dozer.png",
-    dual: false,
-  },
-  {
-    title: "Auto Brake System (ARCAS) HD Dumping High Risk",
-    src: "/rekayasa-arcas.png",
-    dual: false,
-  },
-] as const;
-
-function Fig({ src, alt }: { src: string; alt: string }) {
+function PanelTitle({ children }: { children: React.ReactNode }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} className="mx-auto block h-auto w-full object-contain" />
+    <header className="shrink-0 bg-[#1e3a8a] px-3 py-1.5 text-center">
+      <h3 className="text-[11px] font-extrabold tracking-wide text-white md:text-[12px]">{children}</h3>
+    </header>
+  );
+}
+
+function FitImg({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="relative h-full min-h-0 w-full min-w-0">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        className="absolute inset-0 m-auto max-h-full max-w-full object-contain object-center"
+        draggable={false}
+      />
+    </div>
   );
 }
 
 export default function RekayasaPerformanceSlide({ onBack, onNext }: Props) {
   return (
-    <div className="sp-slide min-h-screen bg-[#f9fafb] text-[color:var(--ink)]">
-      <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-6">
-        {/* Header — sama seperti Safety / Leading */}
-        <motion.header
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
-          className="grid grid-cols-1 items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-[auto_1fr_auto] md:gap-6"
-        >
-          <div className="flex items-center gap-3">
-            {onBack && (
-              <button
-                type="button"
-                onClick={onBack}
-                className="mr-1 rounded-lg border border-slate-200 px-2.5 py-2 text-[11px] font-semibold text-slate-600 transition hover:border-emerald-400 hover:text-emerald-800"
-              >
-                ←
-              </button>
-            )}
-            <div
-              className="grid h-14 w-14 shrink-0 place-items-center rounded-full shadow-md"
-              style={{ background: "radial-gradient(circle at 30% 30%, var(--green-mid), var(--green-deep))" }}
-            >
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="m9 12 2 2 4-4" />
-              </svg>
-            </div>
-            <div className="leading-tight">
-              <div className="text-[11px] font-bold tracking-[0.12em] text-[color:var(--green-mid)]">
-                DIVISI · SYSTEM DEFENDER
-              </div>
-              <div className="max-w-[220px] text-[11px] text-[color:var(--ink-soft)]">
-                Menjaga sistem, agar operasi tetap maju, aman, dan produktif
+    <div className="sp-slide relative flex h-full max-h-full flex-col overflow-hidden bg-white text-[color:var(--ink)]">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-[1600px] min-h-0 flex-col px-3 py-1.5 md:px-4">
+        <header className="shrink-0">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-1">
+            <div className="flex min-w-0 items-center gap-2">
+              {onBack && (
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="text-[11px] font-semibold text-[color:var(--ink-soft)] transition hover:text-[color:var(--green-deep)]"
+                  aria-label="Kembali"
+                >
+                  ←
+                </button>
+              )}
+              <div className="leading-tight">
+                <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-[color:var(--green-mid)]">
+                  System Defender · HSECM Q2 2026
+                </p>
+                <h1 className="font-heading text-base font-extrabold tracking-tight text-[color:var(--ink)] sm:text-lg">
+                  Pengendalian Risiko Rekayasa
+                </h1>
               </div>
             </div>
-          </div>
 
-          <div className="order-3 text-center md:order-2">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-              HSECM Tingkat I · Q2 2026
-            </div>
-            <h1 className="mt-1 font-heading text-xl font-black leading-tight text-[color:var(--ink)] md:text-2xl lg:text-[26px]">
-              Pengendalian Risiko Rekayasa
-            </h1>
-            <p className="mt-1 text-[12px] text-[color:var(--ink-soft)]">
-              Safety Performance · All Site Q2 2026 · Technology Improvements
-            </p>
-          </div>
-
-          <div className="order-2 flex items-center justify-end gap-3 md:order-3">
-            <span className="rounded-full bg-red-600 px-3 py-1.5 text-[11px] font-bold tracking-wide text-white shadow-md">
-              #SiagaSalingMenjaga
-            </span>
-            <div className="border-l border-slate-200 pl-3">
-              <BerauCoalLogo height={36} />
+            <div className="flex items-center gap-2">
+              <span className="sp-hash-stamp text-[9px] sm:text-[10px]">#SiagaSalingMenjaga</span>
+              <BerauCoalLogo height={22} />
             </div>
           </div>
-        </motion.header>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.08 }}
-          className="mt-4 rounded-xl border border-slate-200 border-l-4 border-l-[color:var(--green-mid)] bg-white p-4 pl-5 shadow-sm"
-        >
-          <p className="text-[13px] italic leading-relaxed text-[color:var(--ink)] md:text-sm">
-            &ldquo;{QUOTE}&rdquo;
+          <p className="mt-1 line-clamp-1 text-[10px] leading-snug text-[color:var(--ink-soft)] md:text-[11px]">
+            {QUOTE}
           </p>
-        </motion.div>
+        </header>
 
         <TacticSidebarLayout
-          className="mt-5"
+          className="mt-1"
+          fill
+          contentScroll={false}
+          defaultOpen={false}
           openLabel="Taktik System Defender"
-          closedLabel="Rekayasa penuh"
+          closedLabel="Board Rekayasa"
+          actions={
+            onNext ? (
+              <button
+                type="button"
+                onClick={onNext}
+                className="border border-[color:var(--green-deep)] bg-[color:var(--green-deep)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white transition hover:bg-[color:var(--green-mid)]"
+              >
+                Lanjut →
+              </button>
+            ) : null
+          }
         >
-            {/* Board: KPI | Hierarchy | Tech */}
-            <div className="grid grid-cols-1 gap-3 xl:grid-cols-[148px_minmax(0,1.1fr)_minmax(0,1fr)] xl:items-start">
-              {/* KPI strip */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.14 }}
-                className="flex flex-col gap-2.5 sm:grid sm:grid-cols-3 xl:flex"
-              >
-                {KPIS.map((k, i) => (
-                  <motion.div
-                    key={k.label}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.16 + i * 0.05 }}
-                    className="rounded-xl border-2 border-[color:var(--green-mid)]/35 bg-[#f3f7f3] px-3 py-3.5 text-center shadow-sm"
-                  >
-                    <div
-                      className={`font-heading text-[30px] font-black tabular-nums leading-none md:text-[32px] ${
-                        k.tone === "bad" ? "text-red-600" : "text-[color:var(--ink)]"
-                      }`}
-                    >
-                      {k.value}
-                    </div>
-                    <div className="mt-1.5 text-[9.5px] font-medium leading-snug text-[color:var(--ink-soft)]">
-                      {k.label}
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              {/* Hierarchy */}
-              <motion.section
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.18 }}
-                className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
-              >
-                <header className="bg-[#1e3a8a] px-3 py-2 text-center">
-                  <h2 className="text-[12px] font-extrabold tracking-wide text-white md:text-[13px]">
-                    5 TINGKAT KONTROL REKAYASA (HIERARKI)
-                  </h2>
-                </header>
-                <div className="bg-white p-1.5 md:p-2">
-                  <Fig src="/rekayasa-hierarchy.png" alt="5 Tingkat Kontrol Rekayasa" />
-                </div>
-              </motion.section>
-
-              {/* Technology */}
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.22 }}
-                className="flex flex-col gap-2.5"
-              >
-                {TECH.map((t) => (
-                  <section key={t.title} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                    <header className="bg-[#1e3a8a] px-3 py-1.5">
-                      <h3 className="text-[11px] font-extrabold tracking-wide text-white">{t.title}</h3>
-                    </header>
-                    <div className="bg-white p-1.5">
-                      {t.dual ? (
-                        <div className="grid grid-cols-1 gap-1 sm:grid-cols-[1.1fr_0.9fr]">
-                          <Fig src={t.src} alt={`${t.title} sebelum sesudah`} />
-                          <Fig src={t.extra} alt={`${t.title} langkah`} />
-                        </div>
-                      ) : (
-                        <Fig src={t.src} alt={t.title} />
-                      )}
-                    </div>
-                  </section>
-                ))}
-
-                <div className="rounded-xl border-2 border-[color:var(--green-deep)] bg-[#f0faf2] px-3 py-2.5">
-                  <div className="text-[11px] font-black tracking-wide text-[color:var(--green-deep)]">NEED SUPPORT:</div>
-                  <ul className="mt-1 list-disc space-y-1 pl-3.5 text-[11px] leading-snug text-[color:var(--ink)]">
-                    <li>
-                      Review efektivitas penurunan risiko dari pengendalian rekayasa terhadap kejadian / pelanggaran
-                      aktual.
-                    </li>
-                    <li>
-                      Implementasi iteratif untuk upgrade pengendalian rekayasa pada aktivitas yang masih menyisakan
-                      residual risk.
-                    </li>
-                  </ul>
-                </div>
-              </motion.div>
-            </div>
-        </TacticSidebarLayout>
-
-        <footer className="mt-6 flex flex-col items-center gap-3 py-4 text-center text-[11px] text-[color:var(--ink-soft)]">
-          {onNext && (
-            <button
-              type="button"
-              onClick={onNext}
-              className="rounded-full bg-[color:var(--green-deep)] px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-white shadow-md transition hover:bg-[color:var(--green-mid)]"
+          {/* Layout referensi: KPI | Hierarki | Tech */}
+          <div className="grid h-full min-h-0 grid-cols-1 gap-2 overflow-hidden lg:grid-cols-[148px_minmax(0,1.15fr)_minmax(0,1fr)] lg:grid-rows-1">
+            {/* LEFT — KPI vertical */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="flex min-h-0 flex-col gap-2 sm:grid sm:grid-cols-3 lg:flex"
             >
-              Lanjut: Highlight Summary & Enforcement →
-            </button>
-          )}
-          <div>
-            <span className="inline-flex items-center gap-2">
-              <BerauCoalLogo height={18} />
-              <span>· HSECM Tingkat I · Q2 2026 ·</span>
-            </span>{" "}
-            <span className="font-semibold text-[color:var(--green-mid)]">#SiagaSalingMenjaga</span>
+              {KPIS.map((k, i) => (
+                <motion.div
+                  key={k.label}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.06 + i * 0.04 }}
+                  className="flex min-h-0 flex-1 flex-col items-center justify-center border-2 border-[color:var(--green-mid)]/35 bg-[#f3f7f3] px-2 py-2 text-center"
+                >
+                  <div
+                    className={`font-heading text-[28px] font-black tabular-nums leading-none md:text-[32px] ${
+                      k.tone === "bad" ? "text-red-600" : "text-[color:var(--ink)]"
+                    }`}
+                  >
+                    {k.value}
+                  </div>
+                  {"sub" in k && k.sub ? (
+                    <div className={`mt-0.5 text-[11px] font-bold ${k.tone === "bad" ? "text-red-600" : "text-[color:var(--ink)]"}`}>
+                      {k.sub}
+                    </div>
+                  ) : null}
+                  <div
+                    className={`mt-1.5 text-[9px] font-medium leading-snug ${
+                      k.tone === "bad" ? "text-red-600/90" : "text-[color:var(--ink-soft)]"
+                    }`}
+                  >
+                    {k.label}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* MIDDLE — Hierarchy */}
+            <motion.section
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.08 }}
+              className="flex min-h-0 min-w-0 flex-col overflow-hidden border border-slate-200 bg-white"
+            >
+              <PanelTitle>5 TINGKAT KONTROL REKAYASA (HIERARKI)</PanelTitle>
+              <div className="min-h-0 flex-1 bg-white p-1 sm:p-1.5">
+                <FitImg src="/rekayasa-hierarchy.png" alt="5 Tingkat Kontrol Rekayasa" />
+              </div>
+            </motion.section>
+
+            {/* RIGHT — Tech stack + Need Support */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex min-h-0 min-w-0 flex-col gap-1.5 overflow-hidden"
+            >
+              <section className="flex min-h-0 min-w-0 flex-[1.2] flex-col overflow-hidden border border-slate-200 bg-white">
+                <PanelTitle>Remote Pump</PanelTitle>
+                <div className="grid min-h-0 flex-1 grid-cols-1 gap-0.5 bg-white p-1 sm:grid-cols-[1.15fr_0.85fr]">
+                  <div className="min-h-0 min-w-0 overflow-hidden">
+                    <FitImg src="/rekayasa-pump-ba.png" alt="Remote Pump sebelum sesudah" />
+                  </div>
+                  <div className="min-h-0 min-w-0 overflow-hidden">
+                    <FitImg src="/rekayasa-pump-steps.png" alt="Remote Pump langkah" />
+                  </div>
+                </div>
+              </section>
+
+              <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden border border-slate-200 bg-white">
+                <PanelTitle>Remote Dozer</PanelTitle>
+                <div className="min-h-0 flex-1 bg-white p-1">
+                  <FitImg src="/rekayasa-dozer.png" alt="Remote Dozer" />
+                </div>
+              </section>
+
+              <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden border border-slate-200 bg-white">
+                <PanelTitle>Auto Brake System (ARCAS) HD Dumping High Risk</PanelTitle>
+                <div className="min-h-0 flex-1 bg-white p-1">
+                  <FitImg src="/rekayasa-arcas.png" alt="ARCAS Auto Brake System" />
+                </div>
+              </section>
+
+              <div className="shrink-0 border-2 border-[color:var(--green-deep)] bg-[#f0faf2] px-2.5 py-1.5">
+                <div className="text-[10px] font-black tracking-wide text-[color:var(--green-deep)]">
+                  NEED SUPPORT:
+                </div>
+                <ul className="mt-0.5 list-disc space-y-0.5 pl-3.5 text-[9px] leading-snug text-[color:var(--ink)] sm:text-[10px]">
+                  <li>
+                    Review efektivitas penurunan risiko dari pengendalian Rekayasa Engineering yang sudah
+                    dijalankan dengan aktual insiden &amp; pelanggaran yang terjadi.
+                  </li>
+                  <li>
+                    Iterasi &amp; Implementasi Upgrade efektivitas pengendalian Rekayasa Engineering untuk
+                    aktivitas yang masih memiliki residual risk.
+                  </li>
+                </ul>
+              </div>
+            </motion.div>
           </div>
-        </footer>
+        </TacticSidebarLayout>
       </div>
     </div>
   );

@@ -43,15 +43,15 @@ export default function PanelB() {
   }, [open]);
 
   return (
-    <section className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-5">
-      <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="sp-panel-badge">B</div>
-          <div>
-            <h2 className="font-heading text-base font-black leading-tight text-[color:var(--ink)] md:text-lg">
+    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-lg border border-slate-200 bg-white p-2 shadow-sm md:p-2.5">
+      <div className="mb-1.5 flex shrink-0 flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="sp-panel-badge scale-90">B</div>
+          <div className="min-w-0">
+            <h2 className="font-heading text-sm font-black leading-tight text-[color:var(--ink)] md:text-base">
               Rapor Mining Kontraktor Q2 2026
             </h2>
-            <div className="text-[11px] text-[color:var(--ink-soft)]">
+            <div className="text-[10px] text-[color:var(--ink-soft)]">
               Kuadran · Pergerakan Q1 → Q2 · % Leading vs Lagging Severity
             </div>
           </div>
@@ -59,21 +59,24 @@ export default function PanelB() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-bold text-slate-700 transition hover:bg-slate-100"
+          className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold text-slate-700 transition hover:bg-slate-100"
         >
           Perbesar
         </button>
       </div>
 
-      <ContractorQuadrantBoard
-        size="inline"
-        paused={open}
-        onExpand={() => setOpen(true)}
-      >
-        <ContractorRaporTable variant="compact" />
-      </ContractorQuadrantBoard>
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <ContractorQuadrantBoard
+          size="inline"
+          paused={open}
+          onExpand={() => setOpen(true)}
+          className="h-full"
+        >
+          <ContractorRaporTable variant="compact" />
+        </ContractorQuadrantBoard>
+      </div>
 
-      <p className="mt-4 border-t border-slate-100 pt-3 text-[12px] leading-relaxed text-[color:var(--ink)] md:text-[13px]">
+      <p className="mt-1.5 shrink-0 border-t border-slate-100 bg-white pt-1.5 text-[10px] leading-snug text-[color:var(--ink)] md:text-[11px] line-clamp-3">
         {RAPOR_NARRATIVE}
       </p>
 

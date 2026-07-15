@@ -23,6 +23,8 @@ type Props = {
   defaultOpen?: boolean;
   /** Fill remaining viewport height */
   fill?: boolean;
+  /** Allow content area to scroll (default true when fill) */
+  contentScroll?: boolean;
   /** Extra toolbar actions (e.g. Next button) */
   actions?: ReactNode;
 };
@@ -35,6 +37,7 @@ export default function TacticSidebarLayout({
   className = "",
   defaultOpen = true,
   fill = false,
+  contentScroll = true,
   actions,
 }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(defaultOpen);
@@ -124,7 +127,15 @@ export default function TacticSidebarLayout({
           )}
         </AnimatePresence>
 
-        <div className={`min-w-0 flex-1 ${fill ? "sp-panel-scroll min-h-0 overflow-y-auto overflow-x-hidden" : ""}`}>
+        <div
+          className={`min-w-0 flex-1 ${
+            fill
+              ? contentScroll
+                ? "sp-panel-scroll min-h-0 overflow-y-auto overflow-x-hidden"
+                : "min-h-0 overflow-hidden"
+              : ""
+          }`}
+        >
           {children}
         </div>
       </div>

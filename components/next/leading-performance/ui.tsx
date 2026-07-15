@@ -1,7 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useState, type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { CountUp } from "./CountUp";
 import { useInView } from "../safety-performance/useInView";
 
@@ -79,7 +80,7 @@ const PILLAR_THEME: Record<
     accent: "#166534",
     chip: "bg-white/15 text-white ring-white/25",
     hint: "Klik untuk melihat data",
-    icon: "SA",
+    icon: "LE",
   },
   people: {
     front: "#c2410c",
@@ -121,103 +122,231 @@ export function PillarColumn({
   footer: ReactNode;
 }) {
   const [flipped, setFlipped] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const theme = PILLAR_THEME[tone];
 
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!expanded) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpanded(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [expanded]);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.08 }}
-      transition={{ duration: 0.45, delay, ease: easeOut }}
-      className="lp-flip-scene min-h-[min(68vh,540px)]"
-      style={{ perspective: 1400 }}
-    >
+    <>
       <motion.div
-        className="lp-flip-card relative h-full w-full"
-        style={{ transformStyle: "preserve-3d" }}
-        animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.08 }}
+        transition={{ duration: 0.45, delay, ease: easeOut }}
+        className="lp-flip-scene min-h-[min(68vh,540px)]"
+        style={{ perspective: 1400 }}
       >
-        {/* FRONT — title cover */}
-        <button
-          type="button"
-          onClick={() => setFlipped(true)}
-          aria-label={`Buka ${title}`}
-          className="lp-flip-face absolute inset-0 flex cursor-pointer flex-col overflow-hidden rounded-xl border border-slate-200/80 text-left shadow-sm outline-none transition hover:shadow-md focus-visible:ring-2 focus-visible:ring-slate-400/40"
-          style={{
-            background: theme.front,
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
-            pointerEvents: flipped ? "none" : "auto",
-          }}
+        <motion.div
+          className="lp-flip-card relative h-full w-full"
+          style={{ transformStyle: "preserve-3d" }}
+          animate={{ rotateY: flipped ? 180 : 0 }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="relative z-[1] flex flex-1 flex-col items-center justify-center gap-4 px-5 py-8">
-            <span
-              className={`grid h-14 w-14 place-items-center rounded-xl text-base font-black tracking-wide ring-1 ${theme.chip}`}
-            >
-              {theme.icon}
-            </span>
-            <div className="text-center">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/60">
-                Leading
-              </div>
-              <h3 className="mt-2 font-heading text-xl font-black leading-tight text-white md:text-[22px]">
-                {title}
-              </h3>
-            </div>
-            <span className="mt-1 rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-white/90">
-              {theme.hint}
-            </span>
-          </div>
-        </button>
-
-        {/* BACK — data */}
-        <div
-          className="lp-flip-face absolute inset-0 flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
-          style={{
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(180deg)",
-            pointerEvents: flipped ? "auto" : "none",
-          }}
-        >
-          <header
-            className="relative flex shrink-0 items-center justify-between gap-2 px-3 py-2.5"
-            style={{ background: theme.header }}
+          {/* FRONT — title cover */}
+          <button
+            type="button"
+            onClick={() => setFlipped(true)}
+            aria-label={`Buka ${title}`}
+            className="lp-flip-face absolute inset-0 flex cursor-pointer flex-col overflow-hidden rounded-xl border border-slate-200/80 text-left shadow-sm outline-none transition hover:shadow-md focus-visible:ring-2 focus-visible:ring-slate-400/40"
+            style={{
+              background: theme.front,
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              pointerEvents: flipped ? "none" : "auto",
+            }}
           >
-            <div className="text-[12px] font-bold tracking-[0.04em] text-white md:text-[13px]">
-              {title}
-            </div>
-            <button
-              type="button"
-              onClick={() => setFlipped(false)}
-              className="rounded-md border border-white/25 bg-white/10 px-2 py-0.5 text-[9px] font-bold text-white/90 transition hover:bg-white/20"
-              aria-label="Tutup data"
-            >
-              Tutup
-            </button>
-          </header>
-
-          {flipped && (
-            <motion.div
-              key="pillar-body"
-              className="lp-scroll-hidden flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto p-2.5 md:p-3"
-              variants={pillarStagger}
-              initial="hidden"
-              animate="show"
-            >
-              {children}
-              <motion.div
-                variants={pillarItem}
-                className="lp-footer-box mt-auto pl-3.5 text-[10px] leading-snug text-[color:var(--ink)] md:text-[11px]"
+            <div className="relative z-[1] flex flex-1 flex-col items-center justify-center gap-4 px-5 py-8">
+              <span
+                className={`grid h-14 w-14 place-items-center rounded-xl text-base font-black tracking-wide ring-1 ${theme.chip}`}
               >
-                {footer}
+                {theme.icon}
+              </span>
+              <div className="text-center">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/60">
+                  Leading
+                </div>
+                <h3 className="mt-2 font-heading text-xl font-black leading-tight text-white md:text-[22px]">
+                  {title}
+                </h3>
+              </div>
+              <span className="mt-1 rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-white/90">
+                {theme.hint}
+              </span>
+            </div>
+          </button>
+
+          {/* BACK — data */}
+          <div
+            className="lp-flip-face absolute inset-0 flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+            style={{
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+              pointerEvents: flipped ? "auto" : "none",
+            }}
+          >
+            <header
+              className="relative flex shrink-0 items-center justify-between gap-2 px-3 py-2.5"
+              style={{ background: theme.header }}
+            >
+              <div className="text-[12px] font-bold tracking-[0.04em] text-white md:text-[13px]">
+                {title}
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFlipped(false);
+                }}
+                className="rounded-md border border-white/25 bg-white/10 px-2 py-0.5 text-[9px] font-bold text-white/90 transition hover:bg-white/20"
+                aria-label="Tutup data"
+              >
+                Tutup
+              </button>
+            </header>
+
+            {flipped && (
+              <motion.div
+                key="pillar-body"
+                role="button"
+                tabIndex={0}
+                className="lp-scroll-hidden group relative flex min-h-0 flex-1 cursor-pointer flex-col gap-2.5 overflow-y-auto p-2.5 text-left outline-none md:p-3 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400/40"
+                variants={pillarStagger}
+                initial="hidden"
+                animate="show"
+                onClick={() => setExpanded(true)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setExpanded(true);
+                  }
+                }}
+                aria-label={`Perbesar ${title}`}
+              >
+                {children}
+                <motion.div
+                  variants={pillarItem}
+                  className="lp-footer-box mt-auto pl-3.5 text-[10px] leading-snug text-[color:var(--ink)] md:text-[11px]"
+                >
+                  {footer}
+                </motion.div>
+                <span className="pointer-events-none absolute bottom-2 right-2 rounded-full bg-slate-900/80 px-2.5 py-1 text-[9px] font-bold tracking-wide text-white opacity-0 shadow-sm transition group-hover:opacity-100">
+                  Perbesar
+                </span>
               </motion.div>
-            </motion.div>
-          )}
-        </div>
+            )}
+          </div>
+        </motion.div>
       </motion.div>
-    </motion.div>
+
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {expanded && (
+              <motion.div
+                className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22 }}
+              >
+                <motion.button
+                  type="button"
+                  aria-label="Tutup popup"
+                  className="absolute inset-0 bg-slate-950/55 backdrop-blur-[2px]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setExpanded(false)}
+                />
+
+                <motion.div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby={`pillar-modal-${tone}`}
+                  className="relative z-[1] flex max-h-[min(94vh,880px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-2xl"
+                  initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 14, scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 28 }}
+                >
+                  <div
+                    className="flex shrink-0 items-start justify-between gap-3 px-5 py-3.5 sm:px-6"
+                    style={{ background: theme.header }}
+                  >
+                    <div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65">
+                        Leading Performance
+                      </div>
+                      <h2
+                        id={`pillar-modal-${tone}`}
+                        className="font-heading text-lg font-black text-white sm:text-xl"
+                      >
+                        {title}
+                      </h2>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setExpanded(false)}
+                      className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/25 bg-white/10 text-white transition hover:bg-white/20"
+                      aria-label="Tutup"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+                        <path
+                          d="M4 4l8 8M12 4L4 12"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div
+                    className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5"
+                    style={{ zoom: 1.22 }}
+                  >
+                    {children}
+                    <div className="lp-footer-box pl-3.5 text-[12px] leading-relaxed text-[color:var(--ink)] sm:text-[13px]">
+                      {footer}
+                    </div>
+                  </div>
+
+                  <div className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-100 px-5 py-3 sm:px-6">
+                    <span className="text-[11px] text-slate-400">
+                      Tekan Esc atau klik luar untuk menutup
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setExpanded(false)}
+                      className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-100"
+                    >
+                      Tutup
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
+    </>
   );
 }
 

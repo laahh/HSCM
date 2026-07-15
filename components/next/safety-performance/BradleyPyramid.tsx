@@ -14,7 +14,7 @@ const SIZE: Record<
   PyramidSize,
   { tipH: number; rowH: number; pyrW: number; braceW: number; bottomInset: number }
 > = {
-  inline: { tipH: 52, rowH: 30, pyrW: 300, braceW: 56, bottomInset: 4 },
+  inline: { tipH: 34, rowH: 20, pyrW: 240, braceW: 42, bottomInset: 2 },
   hero: { tipH: 78, rowH: 44, pyrW: 440, braceW: 72, bottomInset: 6 },
 };
 
@@ -705,23 +705,23 @@ export function BradleyPyramid() {
 
   return (
     <>
-      <div ref={ref} className="min-w-0">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-sm font-bold text-[color:var(--ink)]">Piramida Bradley Curve</h3>
-          <span className="text-[10px] text-[color:var(--ink-soft)]">
-            Asimetris · Highlight MTI / Fire Case / Property Damage
+      <div ref={ref} className="flex h-full min-h-0 min-w-0 flex-col">
+        <div className="mb-1 flex shrink-0 flex-wrap items-center justify-between gap-1">
+          <h3 className="text-xs font-bold text-[color:var(--ink)]">Piramida Bradley Curve</h3>
+          <span className="text-[9px] text-[color:var(--ink-soft)]">
+            MTI · Fire · Property Damage
           </span>
         </div>
 
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="group relative w-full cursor-pointer rounded-xl border border-transparent text-left outline-none transition hover:border-slate-200 hover:bg-slate-50/60 focus-visible:ring-2 focus-visible:ring-emerald-600/40"
+          className="group relative min-h-0 w-full flex-1 cursor-pointer rounded-lg border border-transparent text-left outline-none transition hover:border-slate-200 hover:bg-slate-50/60 focus-visible:ring-2 focus-visible:ring-emerald-600/40"
           aria-label="Buka Piramida Bradley Curve dalam ukuran besar"
         >
           <PyramidChart size="inline" play={play} reduceMotion={reduceMotion} />
-          <span className="pointer-events-none absolute bottom-2 right-2 rounded-full bg-slate-900/80 px-2.5 py-1 text-[10px] font-bold tracking-wide text-white opacity-0 shadow-sm transition group-hover:opacity-100 group-focus-visible:opacity-100">
-            Perbesar · animasi jatuh
+          <span className="pointer-events-none absolute bottom-1 right-1 rounded-full bg-slate-900/80 px-2 py-0.5 text-[9px] font-bold tracking-wide text-white opacity-0 shadow-sm transition group-hover:opacity-100 group-focus-visible:opacity-100">
+            Perbesar
           </span>
         </button>
       </div>

@@ -27,7 +27,7 @@ function q2CellClass(tone: (typeof GR_TABLE)[number]["tone"]) {
 export default function PanelLeading() {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 xl:items-stretch xl:gap-3.5">
-      <PillarColumn title="Supervisor Accountability" tone="accountability" delay={0} footer={NARRATIVE.leadership}>
+      <PillarColumn title="Leadership" tone="accountability" delay={0} footer={NARRATIVE.leadership}>
         <PillarBlock>
           <div className="lp-chart-card">
             <div className="mb-0.5 text-[11px] font-bold text-[color:var(--green-deep)]">Weekly Ratio SAP</div>

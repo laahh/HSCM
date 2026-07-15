@@ -54,7 +54,7 @@ export default function LeadingPerformanceSlide({ onBack, onNext }: Props) {
   const active = TABS.find((t) => t.id === activeTab) ?? TABS[0];
 
   return (
-    <div className="sp-slide lp-slide relative flex h-dvh max-h-dvh flex-col overflow-hidden bg-white text-[color:var(--ink)]">
+    <div className="sp-slide lp-slide relative flex h-full max-h-full flex-col overflow-hidden bg-white text-[color:var(--ink)]">
       <div
         className="pointer-events-none absolute -right-20 -top-24 h-[280px] w-[280px] rounded-full border-[20px] border-[color:var(--green-deep)]/[0.04]"
         aria-hidden

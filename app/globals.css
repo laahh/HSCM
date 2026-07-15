@@ -330,6 +330,10 @@ body {
 .sp-slide {
   --paper-soft: #f5f8f5;
 }
+/* Enlarge all type (chrome + panels) on Safety Performance only */
+.sp-performance {
+  zoom: 1.32;
+}
 .sp-hash-stamp {
   display: inline-block;
   transform: rotate(-8deg);

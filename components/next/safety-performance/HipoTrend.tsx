@@ -14,7 +14,7 @@ const DIM: Record<
   ChartSize,
   { w: number; h: number; padL: number; padR: number; padT: number; padB: number; className: string }
 > = {
-  inline: { w: 320, h: 148, padL: 28, padR: 14, padT: 18, padB: 26, className: "h-[148px] w-full" },
+  inline: { w: 320, h: 96, padL: 24, padR: 12, padT: 12, padB: 20, className: "h-[96px] w-full" },
   hero: { w: 720, h: 340, padL: 48, padR: 28, padT: 36, padB: 44, className: "h-auto w-full max-h-[52vh]" },
 };
 
@@ -423,7 +423,7 @@ export function HipoTrend() {
     <>
       <motion.div
         ref={ref}
-        className="overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-3 shadow-sm"
+        className="shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-2 shadow-sm"
         initial={{ opacity: 0, y: 16 }}
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
         transition={{ duration: 0.45, ease: easeOut }}
@@ -434,10 +434,10 @@ export function HipoTrend() {
           className="group relative w-full cursor-pointer rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40"
           aria-label="Buka Tren HIPO dalam ukuran besar"
         >
-          <div className="mb-1 flex items-center justify-between">
-            <h3 className="text-sm font-bold text-[color:var(--ink)]">Tren HIPO</h3>
+          <div className="mb-0.5 flex items-center justify-between gap-2">
+            <h3 className="text-xs font-bold text-[color:var(--ink)]">Tren HIPO</h3>
             <motion.span
-              className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200/80"
+              className="rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 ring-1 ring-emerald-200/80"
               animate={
                 play
                   ? { opacity: [0.65, 1, 0.65], scale: [0.98, 1.03, 0.98] }

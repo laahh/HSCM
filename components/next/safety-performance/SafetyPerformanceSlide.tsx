@@ -65,7 +65,7 @@ export default function SafetyPerformanceSlide({ onBack, onNext }: Props) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className="sp-slide relative flex h-dvh max-h-dvh flex-col overflow-hidden bg-white text-[color:var(--ink)]">
+    <div className="sp-slide sp-performance relative flex h-full max-h-full flex-col overflow-hidden bg-white text-[color:var(--ink)]">
       <motion.div
         className="pointer-events-none absolute -right-20 -top-24 h-[280px] w-[280px] rounded-full border-[20px] border-[color:var(--green-deep)]/[0.04]"
         aria-hidden
@@ -233,7 +233,13 @@ export default function SafetyPerformanceSlide({ onBack, onNext }: Props) {
               )}
             </AnimatePresence>
 
-            <main className="sp-panel-scroll min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
+            <main
+              className={`sp-panel-scroll min-h-0 min-w-0 flex-1 overflow-x-hidden ${
+                activeTab === "all-site" || activeTab === "rapor"
+                  ? "overflow-hidden"
+                  : "overflow-y-auto"
+              }`}
+            >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTab}

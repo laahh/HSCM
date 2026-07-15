@@ -60,7 +60,7 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
           <motion.div
             key="after-intro"
             className={`fixed inset-0 z-[80] ${
-              stage === "slide" ? "overflow-y-auto bg-white" : "overflow-hidden bg-black"
+              stage === "slide" ? "overflow-hidden bg-white" : "overflow-hidden bg-black"
             }`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -101,7 +101,7 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
                 {deckPage === "tactical" ? (
                   <motion.div
                     key="tactical"
-                    className="min-h-full bg-white"
+                    className="h-full overflow-y-auto bg-white"
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -16 }}
@@ -112,7 +112,7 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
                 ) : deckPage === "performance" ? (
                   <motion.div
                     key="performance"
-                    className="min-h-full bg-white"
+                    className="h-full overflow-hidden bg-white"
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -16 }}
@@ -126,7 +126,7 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
                 ) : deckPage === "leading" ? (
                   <motion.div
                     key="leading"
-                    className="min-h-full bg-white"
+                    className="h-full overflow-hidden bg-white"
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -16 }}
@@ -140,7 +140,7 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
                 ) : deckPage === "rekayasa" ? (
                   <motion.div
                     key="rekayasa"
-                    className="min-h-full bg-white"
+                    className="h-full overflow-hidden bg-white"
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -16 }}
@@ -154,7 +154,7 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
                 ) : (
                   <motion.div
                     key="summary"
-                    className="min-h-full bg-white"
+                    className="h-full overflow-y-auto bg-white"
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -16 }}

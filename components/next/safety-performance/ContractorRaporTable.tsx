@@ -76,9 +76,7 @@ export default function ContractorRaporTable({
 
   return (
     <motion.div
-      className={`flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm ${
-        hero ? "min-h-0" : "h-full min-h-[420px]"
-      }`}
+      className="flex h-full min-h-0 flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm"
       initial={play ? { opacity: 0, y: 16 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: easeOut }}
@@ -110,11 +108,11 @@ export default function ContractorRaporTable({
           }`}
         >
           <colgroup>
-            <col className={hero ? "w-[12%]" : "w-[11%]"} />
-            <col className={hero ? "w-[22%]" : "w-[22%]"} />
-            <col className={hero ? "w-[18%]" : "w-[18%]"} />
-            <col className={hero ? "w-[12%]" : "w-[14%]"} />
-            <col className={hero ? "w-[36%]" : "w-[35%]"} />
+            <col className={hero ? "w-[12%]" : "w-[9%]"} />
+            <col className={hero ? "w-[22%]" : "w-[24%]"} />
+            <col className={hero ? "w-[18%]" : "w-[16%]"} />
+            <col className={hero ? "w-[12%]" : "w-[12%]"} />
+            <col className={hero ? "w-[36%]" : "w-[39%]"} />
           </colgroup>
           <thead className="sticky top-0 z-[1]">
             <motion.tr
@@ -226,24 +224,26 @@ export default function ContractorRaporTable({
                     {i === 0 ? (
                       <td
                         rowSpan={rows.length}
-                        className={`border-r border-slate-100 align-middle text-center ${
-                          hero ? "px-3 py-3" : "px-1.5 py-1.5"
+                        className={`overflow-hidden border-r border-slate-100 align-middle text-center ${
+                          hero ? "px-3 py-3" : "px-1 py-1"
                         }`}
                         style={{ background: tone.fill }}
                         title={desc}
                       >
                         <div
-                          className={`font-black leading-none ${hero ? "text-lg" : ""}`}
+                          className={`font-black leading-none ${hero ? "text-lg" : "text-[11px]"}`}
                           style={{ color: tone.text }}
                         >
                           {tone.label}
                         </div>
-                        <div
-                          className={`mt-1 leading-tight ${hero ? "text-[10px]" : "text-[8px]"}`}
-                          style={{ color: tone.text, opacity: 0.8 }}
-                        >
-                          {desc}
-                        </div>
+                        {hero ? (
+                          <div
+                            className="mt-1 text-[10px] leading-tight"
+                            style={{ color: tone.text, opacity: 0.8 }}
+                          >
+                            {desc}
+                          </div>
+                        ) : null}
                       </td>
                     ) : null}
                     <td
@@ -310,7 +310,7 @@ export default function ContractorRaporTable({
                     </td>
                     <td
                       className={`align-middle leading-snug text-[color:var(--ink)] ${
-                        hero ? "px-3 py-2.5" : "px-1.5 py-1"
+                        hero ? "px-3 py-2.5" : "max-w-0 overflow-hidden px-1.5 py-1"
                       }`}
                       style={{ background: i % 2 === 0 ? tone.soft : "#fff" }}
                     >
@@ -334,7 +334,9 @@ export default function ContractorRaporTable({
                           ))}
                         </div>
                       ) : (
-                        row.gapCausal.join(", ")
+                        <span className="line-clamp-2" title={row.gapCausal.join(", ")}>
+                          {row.gapCausal.join(", ")}
+                        </span>
                       )}
                     </td>
                   </motion.tr>

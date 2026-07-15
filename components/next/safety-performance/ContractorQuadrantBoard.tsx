@@ -240,9 +240,9 @@ export function ContractorQuadrantBoard({
 
   return (
     <div ref={ref} className={`flex min-h-0 flex-col ${className}`}>
-      <div className={`mb-2.5 flex flex-wrap items-center gap-2 ${hero ? "mb-3" : ""}`}>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-full border border-slate-200 bg-slate-50 p-0.5 text-[10px] font-bold">
+      <div className={`mb-1.5 flex shrink-0 flex-wrap items-center gap-1.5 ${hero ? "mb-3 gap-2" : ""}`}>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <div className={`inline-flex rounded-full border border-slate-200 bg-slate-50 p-0.5 font-bold ${hero ? "text-[10px]" : "text-[9px]"}`}>
             {(
               [
                 { id: "q1" as const, label: "Q1" },
@@ -256,7 +256,7 @@ export function ContractorQuadrantBoard({
                   e.stopPropagation();
                   pickPeriod(p.id);
                 }}
-                className={`rounded-full px-3 py-1 transition-colors ${
+                className={`rounded-full transition-colors ${hero ? "px-3 py-1" : "px-2 py-0.5"} ${
                   !auto && (mode === p.id || (mode === "morph" && p.id === "q2"))
                     ? "bg-[color:var(--green-deep)] text-white shadow-sm"
                     : auto &&
@@ -278,7 +278,9 @@ export function ContractorQuadrantBoard({
               toggleAuto();
             }}
             disabled={!!reduceMotion}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold transition disabled:opacity-50 ${
+            className={`inline-flex items-center gap-1 rounded-full border font-bold transition disabled:opacity-50 ${
+              hero ? "gap-1.5 px-3 py-1 text-[10px]" : "px-2 py-0.5 text-[9px]"
+            } ${
               auto
                 ? "border-[color:var(--green-line)] bg-[color:var(--green-deep)] text-white"
                 : "border-[color:var(--green-line)] bg-white text-[color:var(--green-deep)] hover:bg-[color:var(--paper-soft)]"
@@ -288,21 +290,55 @@ export function ContractorQuadrantBoard({
             {auto ? (playing ? "Auto Q1→Q2" : "Auto (pause)") : "Nyalakan Auto"}
           </button>
         </div>
+
+        {/* Inline: filters share the same row */}
+        {!hero && (
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
+            {(
+              [
+                { id: "all" as const, label: "Semua", n: enriched.length, color: "#334155" },
+                { id: "up" as const, label: "↑", n: summary.up, color: "#16a34a" },
+                { id: "down" as const, label: "↓", n: summary.down, color: "#dc2626" },
+                { id: "flat" as const, label: "=", n: summary.flat, color: "#64748b" },
+              ] as const
+            ).map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFilterMove(c.id);
+                }}
+                className={`inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold transition ${
+                  filterMove === c.id
+                    ? "border-slate-300 bg-white shadow-sm"
+                    : "border-transparent bg-slate-50 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: c.color }} />
+                {c.label}
+                <span className="tabular-nums text-slate-500">{c.n}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Auto progress rail */}
-      <div className="mb-2.5">
-        <div className="mb-1 flex items-center justify-between text-[9px] font-semibold uppercase tracking-wide text-slate-400">
-          <span>
-            {mode === "q1"
-              ? "Posisi Q1"
-              : mode === "morph"
-                ? "Bergerak dari asal Q1…"
-                : "Asal Q1 → Posisi Q2"}
-          </span>
-          <span className="tabular-nums">{auto ? "Loop otomatis" : "Manual"}</span>
-        </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+      {/* Auto progress rail — thinner on inline */}
+      <div className={`shrink-0 ${hero ? "mb-2.5" : "mb-1"}`}>
+        {hero && (
+          <div className="mb-1 flex items-center justify-between text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+            <span>
+              {mode === "q1"
+                ? "Posisi Q1"
+                : mode === "morph"
+                  ? "Bergerak dari asal Q1…"
+                  : "Asal Q1 → Posisi Q2"}
+            </span>
+            <span className="tabular-nums">{auto ? "Loop otomatis" : "Manual"}</span>
+          </div>
+        )}
+        <div className={`overflow-hidden rounded-full bg-slate-100 ${hero ? "h-1.5" : "h-1"}`}>
           <motion.div
             className="h-full rounded-full"
             style={{
@@ -317,14 +353,17 @@ export function ContractorQuadrantBoard({
             transition={{ duration: 0.05 }}
           />
         </div>
-        <div className="mt-1 flex justify-between text-[8px] font-bold text-slate-400">
-          <span>Q1</span>
-          <span>Morph</span>
-          <span>Q2</span>
-        </div>
+        {hero && (
+          <div className="mt-1 flex justify-between text-[8px] font-bold text-slate-400">
+            <span>Q1</span>
+            <span>Morph</span>
+            <span>Q2</span>
+          </div>
+        )}
       </div>
 
-      {/* Movement summary */}
+      {/* Movement summary — hero only (inline filters are in toolbar) */}
+      {hero && (
       <div className="mb-3 flex flex-wrap items-center gap-1.5">
         <span className="mr-1 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[9px] font-bold text-slate-600">
           <span className="inline-block h-3 w-3 rounded-full border border-slate-400 bg-slate-200 grayscale" />
@@ -379,33 +418,44 @@ export function ContractorQuadrantBoard({
           </span>
         </div>
       </div>
+      )}
 
       <div
         className={
           children
-            ? "grid min-h-0 grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] xl:items-stretch"
-            : undefined
+            ? `grid min-h-0 flex-1 grid-cols-1 overflow-hidden ${
+                hero
+                  ? "gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] xl:items-stretch"
+                  : "gap-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)] lg:items-stretch"
+              }`
+            : "min-h-0 flex-1 overflow-hidden"
         }
       >
-      <div className={children ? "group relative min-h-0 min-w-0" : undefined}>
+      <div className={children ? "group relative flex min-h-0 min-w-0 flex-col overflow-hidden" : undefined}>
       <div
-        className={`qb-stage relative min-h-0 overflow-hidden rounded-2xl border border-slate-200/90 ${
-          hero ? "min-h-[min(52vh,480px)]" : "h-full"
+        className={`qb-stage relative min-h-0 flex-1 overflow-hidden rounded-xl border border-slate-200/90 ${
+          hero ? "min-h-[min(52vh,480px)] rounded-2xl" : "min-h-[240px]"
         } ${onExpand ? "cursor-pointer" : ""}`}
         onClick={onExpand}
       >
         <div className="pointer-events-none absolute inset-0 qb-grid-fade" aria-hidden />
 
-        <div className="pointer-events-none absolute left-2 top-1/2 z-[1] hidden -translate-y-1/2 -rotate-90 text-[9px] font-bold tracking-[0.18em] text-slate-400 sm:block">
-          LAGGING SEVERITY ↑
-        </div>
-        <div className="pointer-events-none absolute bottom-[4.75rem] left-1/2 z-[1] -translate-x-1/2 text-[9px] font-bold tracking-[0.18em] text-slate-400">
-          % LEADING →
-        </div>
+        {hero && (
+          <>
+            <div className="pointer-events-none absolute left-2 top-1/2 z-[1] hidden -translate-y-1/2 -rotate-90 text-[9px] font-bold tracking-[0.18em] text-slate-400 sm:block">
+              LAGGING SEVERITY ↑
+            </div>
+            <div className="pointer-events-none absolute bottom-[4.75rem] left-1/2 z-[1] -translate-x-1/2 text-[9px] font-bold tracking-[0.18em] text-slate-400">
+              % LEADING →
+            </div>
+          </>
+        )}
 
         {/* Period beacon */}
         <motion.div
-          className="pointer-events-none absolute right-3 top-3 z-[2] rounded-full px-2.5 py-1 text-[10px] font-black tracking-wide text-white shadow-sm"
+          className={`pointer-events-none absolute right-2 top-2 z-[2] rounded-full font-black tracking-wide text-white shadow-sm ${
+            hero ? "right-3 top-3 px-2.5 py-1 text-[10px]" : "px-2 py-0.5 text-[9px]"
+          }`}
           style={{
             background:
               mode === "q1" ? "#64748b" : mode === "morph" ? "#0f766e" : "var(--green-deep, #166534)",
@@ -417,9 +467,26 @@ export function ContractorQuadrantBoard({
           {mode === "q1" ? "POSISI Q1" : mode === "morph" ? "BERGERAK → Q2" : "POSISI Q2"}
         </motion.div>
 
-        <div className="relative w-full pb-14">
-        <div className="relative w-full">
-        <svg viewBox="0 0 760 400" className="block h-auto w-full" aria-label="Scatter Q1 ke Q2 mining contractor">
+        <div
+          className={
+            hero
+              ? "relative w-full pb-14"
+              : `absolute inset-0 flex items-center justify-center p-1 ${selected ? "pb-11" : ""}`
+          }
+        >
+        <div
+          className={
+            hero
+              ? "relative w-full"
+              : "relative aspect-[760/400] h-auto max-h-full w-full"
+          }
+        >
+        <svg
+          viewBox="0 0 760 400"
+          preserveAspectRatio="xMidYMid meet"
+          className={hero ? "block h-auto w-full" : "block h-full w-full"}
+          aria-label="Scatter Q1 ke Q2 mining contractor"
+        >
           <defs>
             <linearGradient id={`${uid}-sev`} x1="0" y1="1" x2="0" y2="0">
               <stop offset="0%" stopColor="#16a34a" stopOpacity="0.7" />
@@ -724,7 +791,7 @@ export function ContractorQuadrantBoard({
             const xPct = (sx(d.leadQ1) / 760) * 100;
             const yPct = (sy(d.sevQ1) / 400) * 100;
             const dim = Boolean(active && active !== d.name);
-            const size = hero ? 34 : 28;
+            const size = hero ? 34 : 32;
 
             return (
               <motion.div
@@ -820,8 +887,12 @@ export function ContractorQuadrantBoard({
         </div>
         </div>
 
-        {/* Detail dock */}
-        <div className="absolute inset-x-3 bottom-3 z-[2] sm:inset-x-4">
+        {/* Detail dock — hint only on hero; selected dock on both */}
+        <div
+          className={`absolute inset-x-2 z-[2] ${
+            hero ? "bottom-3 sm:inset-x-4" : "bottom-1.5 inset-x-1.5"
+          }`}
+        >
           <AnimatePresence mode="wait">
             {selected ? (
               <motion.div
@@ -830,12 +901,18 @@ export function ContractorQuadrantBoard({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 6 }}
                 transition={{ duration: 0.28, ease }}
-                className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200/90 bg-white/95 p-3 shadow-sm backdrop-blur-md sm:grid-cols-6"
+                className={`grid grid-cols-2 gap-1.5 border border-slate-200/90 bg-white/95 shadow-sm backdrop-blur-md ${
+                  hero
+                    ? "gap-2 rounded-2xl p-3 sm:grid-cols-6"
+                    : "rounded-lg p-1.5 sm:grid-cols-4"
+                }`}
               >
-                <div className="col-span-2 flex items-center gap-2 sm:col-span-2">
+                <div className={`flex items-center gap-2 ${hero ? "col-span-2 sm:col-span-2" : "col-span-2"}`}>
                   {contractorLogo(selected.name) && (
                     <div
-                      className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full border-2 bg-white"
+                      className={`grid shrink-0 place-items-center overflow-hidden rounded-full border-2 bg-white ${
+                        hero ? "h-11 w-11" : "h-7 w-7"
+                      }`}
                       style={{ borderColor: Q_META[selected.q].fill }}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -846,61 +923,60 @@ export function ContractorQuadrantBoard({
                       />
                     </div>
                   )}
-                  <div className="flex min-w-0 flex-col gap-1">
+                  <div className="flex min-w-0 flex-col gap-0.5">
                     <span
-                      className="w-fit rounded-md px-2 py-0.5 text-[9px] font-black text-white"
+                      className="w-fit rounded-md px-1.5 py-0.5 text-[8px] font-black text-white"
                       style={{ background: Q_META[selected.q].fill }}
                     >
                       {selected.q1} → {selected.q}
                     </span>
-                    <div className="font-heading text-sm font-black leading-tight text-[color:var(--ink)]">
+                    <div
+                      className={`font-heading font-black leading-tight text-[color:var(--ink)] ${
+                        hero ? "text-sm" : "text-[11px]"
+                      }`}
+                    >
                       {selected.name}
                     </div>
                   </div>
-                  <span
-                    className={`ml-auto rounded-full px-2 py-0.5 text-[9px] font-bold ${
-                      selected.move === "up"
-                        ? "bg-emerald-50 text-emerald-700"
-                        : selected.move === "down"
-                          ? "bg-red-50 text-red-700"
-                          : "bg-slate-100 text-slate-600"
-                    }`}
-                  >
-                    {selected.move === "up" ? "Membaik" : selected.move === "down" ? "Memburuk" : "Stabil"}
-                  </span>
                 </div>
-                <div className="rounded-xl bg-slate-50 px-2.5 py-2">
-                  <div className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">Insiden Q2</div>
-                  <div className="mt-0.5 text-[12px] font-bold text-[color:var(--ink)]">{selected.inc}</div>
+                <div className={`rounded-lg bg-slate-50 ${hero ? "rounded-xl px-2.5 py-2" : "px-1.5 py-1"}`}>
+                  <div className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">Insiden</div>
+                  <div className={`font-bold text-[color:var(--ink)] ${hero ? "mt-0.5 text-[12px]" : "text-[10px]"}`}>
+                    {selected.inc}
+                  </div>
                 </div>
-                <div className="rounded-xl bg-slate-50 px-2.5 py-2">
-                  <div className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">Δ Leading</div>
+                <div className={`rounded-lg bg-slate-50 ${hero ? "rounded-xl px-2.5 py-2" : "px-1.5 py-1"}`}>
+                  <div className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">Δ Lead</div>
                   <div
-                    className={`mt-0.5 font-heading text-[13px] font-black tabular-nums ${
+                    className={`font-heading font-black tabular-nums ${
                       selected.dLead >= 0 ? "text-emerald-700" : "text-red-600"
-                    }`}
+                    } ${hero ? "mt-0.5 text-[13px]" : "text-[10px]"}`}
                   >
-                    {fmtΔ(selected.dLead)} pp
+                    {fmtΔ(selected.dLead)}
                   </div>
                 </div>
-                <div className="rounded-xl bg-slate-50 px-2.5 py-2">
-                  <div className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">Δ Severity</div>
-                  <div
-                    className={`mt-0.5 font-heading text-[13px] font-black tabular-nums ${
-                      selected.dSev <= 0 ? "text-emerald-700" : "text-red-600"
-                    }`}
-                  >
-                    {fmtΔ(selected.dSev)}
-                  </div>
-                </div>
-                <div className="col-span-2 rounded-xl bg-slate-50 px-2.5 py-2 sm:col-span-1">
-                  <div className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">Catatan</div>
-                  <div className="mt-0.5 text-[11px] font-semibold leading-snug text-[color:var(--ink)]">
-                    {selected.gap}
-                  </div>
-                </div>
+                {hero && (
+                  <>
+                    <div className="rounded-xl bg-slate-50 px-2.5 py-2">
+                      <div className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">Δ Severity</div>
+                      <div
+                        className={`mt-0.5 font-heading text-[13px] font-black tabular-nums ${
+                          selected.dSev <= 0 ? "text-emerald-700" : "text-red-600"
+                        }`}
+                      >
+                        {fmtΔ(selected.dSev)}
+                      </div>
+                    </div>
+                    <div className="col-span-2 rounded-xl bg-slate-50 px-2.5 py-2 sm:col-span-1">
+                      <div className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">Catatan</div>
+                      <div className="mt-0.5 text-[11px] font-semibold leading-snug text-[color:var(--ink)]">
+                        {selected.gap}
+                      </div>
+                    </div>
+                  </>
+                )}
               </motion.div>
-            ) : (
+            ) : hero ? (
               <motion.div
                 key="hint"
                 initial={{ opacity: 0 }}
@@ -910,12 +986,12 @@ export function ContractorQuadrantBoard({
               >
                 Panah menunjuk dari asal Q1 (logo abu-abu) ke posisi Q2 (logo warna) — hover untuk detail Δ
               </motion.div>
-            )}
+            ) : null}
           </AnimatePresence>
         </div>
       </div>
       </div>
-      {children ? <div className="min-h-0 min-w-0">{children}</div> : null}
+      {children ? <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">{children}</div> : null}
       </div>
 
     </div>

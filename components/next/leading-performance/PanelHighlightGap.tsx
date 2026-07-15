@@ -4,6 +4,35 @@ import { Fragment } from "react";
 import { motion } from "framer-motion";
 import { GAP_CONTRACTORS, GAP_MATRIX, GAP_NARRATIVE } from "./data";
 
+function GapMark({ show }: { show: boolean }) {
+  if (!show) {
+    return <span className="text-slate-200">·</span>;
+  }
+
+  return (
+    <motion.span
+      className="inline-flex h-6 w-6 items-center justify-center rounded border-[1.5px] border-red-600 bg-red-50 text-[13px] font-black leading-none text-red-700 shadow-[0_0_0_1px_rgba(220,38,38,0.12)]"
+      animate={{
+        opacity: [1, 0.25, 1],
+        scale: [1, 0.94, 1],
+        boxShadow: [
+          "0 0 0 1px rgba(220,38,38,0.15)",
+          "0 0 0 3px rgba(220,38,38,0.35)",
+          "0 0 0 1px rgba(220,38,38,0.15)",
+        ],
+      }}
+      transition={{
+        duration: 1.15,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+      aria-label="Gap"
+    >
+      X
+    </motion.span>
+  );
+}
+
 export default function PanelHighlightGap() {
   return (
     <motion.div
@@ -12,7 +41,7 @@ export default function PanelHighlightGap() {
       transition={{ duration: 0.4 }}
       className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
     >
-      <header className="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-5 py-3.5">
+      <header className="border-b border-slate-200 bg-slate-50 px-5 py-3.5">
         <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--ink-soft)]">
           Highlight
         </div>
@@ -74,11 +103,13 @@ export default function PanelHighlightGap() {
                       {row.gaps.map((hasGap, gi) => (
                         <td
                           key={`${row.metric}-${GAP_CONTRACTORS[gi]}`}
-                          className={`border-b border-slate-100 px-1 py-1 text-center text-[12px] font-black ${
-                            hasGap ? "bg-red-100 text-red-700" : "bg-white text-transparent"
+                          className={`border-b border-slate-100 px-1 py-1.5 text-center ${
+                            hasGap
+                              ? "bg-red-50 ring-1 ring-inset ring-red-500/70"
+                              : "bg-white"
                           }`}
                         >
-                          {hasGap ? "X" : "·"}
+                          <GapMark show={hasGap} />
                         </td>
                       ))}
                     </motion.tr>

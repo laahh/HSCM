@@ -27,7 +27,7 @@ function q2CellClass(tone: (typeof GR_TABLE)[number]["tone"]) {
 export default function PanelLeading() {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 xl:items-stretch xl:gap-3.5">
-      <PillarColumn title="Supervisor Accountability" delay={0} footer={NARRATIVE.leadership}>
+      <PillarColumn title="Supervisor Accountability" tone="accountability" delay={0} footer={NARRATIVE.leadership}>
         <PillarBlock>
           <div className="lp-chart-card">
             <div className="mb-0.5 text-[11px] font-bold text-[color:var(--green-deep)]">Weekly Ratio SAP</div>
@@ -107,7 +107,7 @@ export default function PanelLeading() {
         </PillarBlock>
       </PillarColumn>
 
-      <PillarColumn title="People" delay={0.06} footer={NARRATIVE.people}>
+      <PillarColumn title="People" tone="people" delay={0.06} footer={NARRATIVE.people}>
         <PillarBlock>
           <KpiSimple label="Valid Golden Rules" from={15} to={33} toTone="bad" />
         </PillarBlock>
@@ -139,6 +139,7 @@ export default function PanelLeading() {
 
       <PillarColumn
         title="Process"
+        tone="process"
         delay={0.12}
         footer={
           <ul className="list-disc space-y-1 pl-3.5">
@@ -170,6 +171,7 @@ export default function PanelLeading() {
 
       <PillarColumn
         title="Technology"
+        tone="technology"
         delay={0.18}
         footer={
           <ul className="list-disc space-y-1 pl-3.5">

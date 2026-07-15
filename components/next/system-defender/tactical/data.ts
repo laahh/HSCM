@@ -75,9 +75,9 @@ const RAW_TACTICS: RawTactic[] = [
   {
     id: "read-game",
     title: "READ THE GAME",
-    formation: "4-3-3",
-    desc: "Membaca pergerakan lawan, risiko lebih awal dari data, observasi, dan pengalaman.",
-    centerMessage: "Membaca perubahan situasi dan mengenali precursor sebelum menjadi insiden.",
+    formation: "LAGGING",
+    desc: "Menggambarkan kondisi performance lagging beserta profilingnya.",
+    centerMessage: "Menggambarkan kondisi performance lagging beserta profilingnya.",
     positions: {
       gk: { x: 50, y: 94 }, lb: { x: 14, y: 78 }, cb1: { x: 36, y: 82 }, cb2: { x: 64, y: 82 }, rb: { x: 86, y: 78 },
       dm: { x: 50, y: 62 }, cm1: { x: 24, y: 58 }, cm2: { x: 76, y: 58 },
@@ -92,9 +92,9 @@ const RAW_TACTICS: RawTactic[] = [
   {
     id: "maintain-shape",
     title: "MAINTAIN SHAPE",
-    formation: "4-4-2",
-    desc: "Menjaga struktur dan jarak pengendalian agar tidak ada celah risiko.",
-    centerMessage: "Menjaga struktur pengendalian agar tidak terbentuk blind spot dan control gap.",
+    formation: "LEADING",
+    desc: "Strategi pengendalian performance melalui indikator leading.",
+    centerMessage: "Strategi pengendalian performance melalui indikator leading.",
     positions: {
       gk: { x: 50, y: 94 }, lb: { x: 24, y: 78 }, cb1: { x: 42, y: 80 }, cb2: { x: 58, y: 80 }, rb: { x: 76, y: 78 },
       dm: { x: 24, y: 58 }, cm1: { x: 42, y: 60 }, cm2: { x: 58, y: 60 }, lw: { x: 76, y: 58 },
@@ -113,9 +113,9 @@ const RAW_TACTICS: RawTactic[] = [
   {
     id: "direct-team",
     title: "DIRECT THE TEAM",
-    formation: "4-3-3",
-    desc: "Komunikasi, arahan, dan pengingat agar semua berada pada posisi yang benar.",
-    centerMessage: "Memastikan komunikasi, handover, dan arahan lapangan diterima dengan benar.",
+    formation: "LEADERSHIP",
+    desc: "Leadership mengarahkan dan memastikan pekerja melaksanakan pekerjaan dengan benar.",
+    centerMessage: "Leadership mengarahkan dan memastikan pekerja melaksanakan pekerjaan dengan benar.",
     positions: {
       gk: { x: 50, y: 94 }, lb: { x: 20, y: 80 }, cb1: { x: 40, y: 82 }, cb2: { x: 60, y: 82 }, rb: { x: 80, y: 80 },
       dm: { x: 50, y: 62 }, cm1: { x: 30, y: 60 }, cm2: { x: 70, y: 60 },
@@ -129,9 +129,9 @@ const RAW_TACTICS: RawTactic[] = [
   {
     id: "intercept-early",
     title: "INTERCEPT EARLY",
-    formation: "4-2-3-1",
-    desc: "Memotong serangan risiko sebelum masuk ke area berbahaya.",
-    centerMessage: "Intervensi dilakukan pada precursor, bukan menunggu konsekuensi terjadi.",
+    formation: "EARLY DETECT",
+    desc: "Deteksi dini gap dan pembacaan anomia, sebelum terjadi peningkatan risiko.",
+    centerMessage: "Deteksi dini gap dan pembacaan anomia, sebelum terjadi peningkatan risiko.",
     positions: {
       gk: { x: 50, y: 94 }, lb: { x: 20, y: 74 }, cb1: { x: 40, y: 76 }, cb2: { x: 60, y: 76 }, rb: { x: 80, y: 74 },
       dm: { x: 38, y: 58 }, cm1: { x: 62, y: 58 },
@@ -150,9 +150,9 @@ const RAW_TACTICS: RawTactic[] = [
   {
     id: "protect-critical",
     title: "PROTECT CRITICAL AREA",
-    formation: "5-4-1",
-    desc: "Fokus melindungi area dengan konsekuensi tertinggi.",
-    centerMessage: "Sumber daya dan pengawasan diprioritaskan pada area berkonsekuensi tertinggi.",
+    formation: "CRITICAL",
+    desc: "Pengendalian pada area kritis.",
+    centerMessage: "Pengendalian pada area kritis.",
     positions: {
       gk: { x: 50, y: 95 }, lb: { x: 14, y: 82 }, cb1: { x: 30, y: 84 }, dm: { x: 50, y: 85 }, cb2: { x: 70, y: 84 }, rb: { x: 86, y: 82 },
       cm1: { x: 24, y: 68 }, cm2: { x: 42, y: 70 }, lw: { x: 58, y: 70 }, rw: { x: 76, y: 68 },
@@ -169,9 +169,9 @@ const RAW_TACTICS: RawTactic[] = [
   {
     id: "build-from-back",
     title: "BUILD FROM THE BACK",
-    formation: "3-2-4-1",
-    desc: "Memberikan solusi, menyederhanakan kontrol, dan membantu operasi maju dengan aman.",
-    centerMessage: "Kontrol yang kuat menjadi fondasi agar operasi dapat maju dengan aman.",
+    formation: "SOLUTION",
+    desc: "Memberikan solusi menyederhanakan.",
+    centerMessage: "Memberikan solusi menyederhanakan.",
     positions: {
       gk: { x: 50, y: 95 }, cb1: { x: 26, y: 82 }, dm: { x: 50, y: 84 }, cb2: { x: 74, y: 82 },
       lb: { x: 38, y: 68 }, rb: { x: 62, y: 68 },

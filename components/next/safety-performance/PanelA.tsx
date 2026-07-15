@@ -1,111 +1,70 @@
 "use client";
 
-import { GAP_ITEMS, GOOD_RECORD, HIPO, STACKED } from "./data";
+import { motion, useReducedMotion } from "framer-motion";
+import { GAP_ITEMS, GOOD_RECORD, STACKED } from "./data";
 import { useInView } from "./useInView";
 import { BradleyPyramid } from "./BradleyPyramid";
+import { HipoTrend } from "./HipoTrend";
 
-function HipoChart() {
-  const { ref, inView } = useInView<HTMLDivElement>(0.25);
-  const w = 320;
-  const h = 140;
-  const padL = 28;
-  const padR = 12;
-  const padT = 16;
-  const padB = 24;
-  const max = 8;
-  const sx = (i: number) => padL + (i / (HIPO.values.length - 1)) * (w - padL - padR);
-  const sy = (v: number) => padT + (1 - v / max) * (h - padT - padB);
-  let pathD = `M ${sx(0)} ${sy(HIPO.values[0])}`;
-  HIPO.values.forEach((v, i) => {
-    if (i > 0) pathD += ` L ${sx(i)} ${sy(v)}`;
-  });
-  const areaD = `${pathD} L ${sx(HIPO.values.length - 1)} ${h - padB} L ${sx(0)} ${h - padB} Z`;
-  const last = HIPO.values.length - 1;
-
-  return (
-    <div ref={ref} className="rounded-lg border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-3">
-      <div className="mb-1 flex items-center justify-between">
-        <h3 className="text-sm font-bold text-[color:var(--ink)]">Tren HIPO</h3>
-        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-          Q1&apos;26 7,3 → Q2&apos;26 2,0
-        </span>
-      </div>
-      <svg viewBox={`0 0 ${w} ${h}`} className="h-[140px] w-full" aria-label="Tren HIPO">
-        <defs>
-          <linearGradient id="hipoFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7a1f1f" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="#7a1f1f" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        {[0, 2, 4, 6, 8].map((v) => (
-          <g key={v}>
-            <line x1={padL} y1={sy(v)} x2={w - padR} y2={sy(v)} stroke="#e8eee8" />
-            <text x={padL - 4} y={sy(v) + 3} fontSize="8" fill="#6b7d72" textAnchor="end">
-              {v}
-            </text>
-          </g>
-        ))}
-        <path d={areaD} fill="url(#hipoFill)" opacity={inView ? 1 : 0} style={{ transition: "opacity .8s ease .4s" }} />
-        <path
-          d={pathD}
-          fill="none"
-          stroke="#7a1f1f"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          pathLength={1}
-          style={{
-            strokeDasharray: 1,
-            strokeDashoffset: inView ? 0 : 1,
-            transition: "stroke-dashoffset 1.15s ease-out",
-          }}
-        />
-        {HIPO.values.map((v, i) => (
-          <g key={HIPO.labels[i]}>
-            <circle
-              cx={sx(i)}
-              cy={sy(v)}
-              r={i === last ? 5 : 3.5}
-              fill={i === last ? "#16a34a" : "#7a1f1f"}
-              stroke="#fff"
-              strokeWidth="1.6"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "scale(1)" : "scale(0)",
-                transformBox: "fill-box",
-                transformOrigin: "center",
-                transition: `opacity .35s ease ${0.9 + i * 0.1}s, transform .45s cubic-bezier(.34,1.56,.64,1) ${0.9 + i * 0.1}s`,
-              }}
-            />
-            {i === last && (
-              <text x={sx(i)} y={sy(v) - 10} fontSize="10" fontWeight="800" fill="#16a34a" textAnchor="middle" opacity={inView ? 1 : 0}>
-                2,0
-              </text>
-            )}
-          </g>
-        ))}
-        {HIPO.labels.map((l, i) => (
-          <text key={l} x={sx(i)} y={h - 6} fontSize="8" fill="#6b7d72" textAnchor="middle">
-            {l}
-          </text>
-        ))}
-      </svg>
-    </div>
-  );
-}
+const easeOut = [0.22, 1, 0.36, 1] as const;
 
 function StackedBars() {
   const { ref, inView } = useInView<HTMLDivElement>(0.2);
+  const reduceMotion = useReducedMotion();
+  const play = inView && !reduceMotion;
   const max = 14;
+  const pct = (v: number) => `${(v / max) * 100}%`;
+
+  /** Per-column timing so bars feel independent, not in lockstep */
+  const colMotion = STACKED.labels.map((_, i) => {
+    const grow = 0.55 + (i % 3) * 0.12;
+    const hold = 0.9 + (i % 2) * 0.35;
+    const shrink = 0.5 + ((i + 1) % 3) * 0.1;
+    const pause = 0.25 + (i % 4) * 0.12;
+    const duration = grow + hold + shrink + pause;
+    const tGrow = grow / duration;
+    const tHold = (grow + hold) / duration;
+    const tShrink = (grow + hold + shrink) / duration;
+    return {
+      duration,
+      delay: i * 0.22 + (i % 2) * 0.08,
+      times: [0, tGrow, tHold, tShrink, 1] as number[],
+      bobDur: 2.4 + (i % 3) * 0.45,
+      bobAmp: i % 2 === 0 ? -3 : -1.5,
+    };
+  });
 
   return (
-    <div ref={ref} className="rounded-lg border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-3">
+    <motion.div
+      ref={ref}
+      className="overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-3 shadow-sm"
+      initial={{ opacity: 0, y: 16 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+      transition={{ duration: 0.45, ease: easeOut }}
+    >
       <div className="mb-2 flex items-center justify-between gap-2">
         <h3 className="text-sm font-bold text-[color:var(--ink)]">Nearmiss · Fire · Property Damage</h3>
         <div className="flex flex-wrap justify-end gap-2 text-[9px]">
-          <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-slate-400" /> NM</span>
-          <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-red-600" /> Fire</span>
-          <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-[color:var(--accent-orange)]" /> PD</span>
+          {(
+            [
+              { c: "bg-slate-400", t: "NM" },
+              { c: "bg-red-600", t: "Fire" },
+              { c: "bg-[color:var(--accent-orange)]", t: "PD" },
+            ] as const
+          ).map((leg, li) => (
+            <motion.span
+              key={leg.t}
+              className="inline-flex items-center gap-1"
+              animate={play ? { opacity: [0.5, 1, 0.5] } : { opacity: 1 }}
+              transition={
+                play
+                  ? { duration: 2.6 + li * 0.4, repeat: Infinity, ease: "easeInOut", delay: li * 0.35 }
+                  : undefined
+              }
+            >
+              <span className={`h-2 w-2 rounded-sm ${leg.c}`} /> {leg.t}
+            </motion.span>
+          ))}
         </div>
       </div>
       <div className="flex h-[160px] items-end gap-2 px-1 pb-6 pt-2">
@@ -114,81 +73,198 @@ function StackedBars() {
           const fire = STACKED.fire[i];
           const pd = STACKED.pd[i];
           const total = STACKED.totals[i];
-          const pct = (v: number) => `${(v / max) * 100}%`;
+          const m = colMotion[i];
+          const segments = [
+            { h: nm, color: "bg-slate-400", key: "nm", lag: 0 },
+            { h: fire, color: "bg-red-600", key: "fire", lag: 0.07 },
+            { h: pd, color: "bg-[color:var(--accent-orange)]", key: "pd", lag: 0.14 },
+          ] as const;
+
           return (
-            <div key={label} className="relative flex flex-1 flex-col items-center justify-end">
-              <span
+            <motion.div
+              key={label}
+              className="relative flex flex-1 flex-col items-center justify-end"
+              animate={play ? { y: [0, m.bobAmp, 0] } : { y: 0 }}
+              transition={
+                play
+                  ? {
+                      duration: m.bobDur,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: m.delay * 0.4,
+                    }
+                  : undefined
+              }
+            >
+              <motion.span
                 className="mb-1 text-[10px] font-extrabold text-[color:var(--ink)]"
-                style={{ opacity: inView ? 1 : 0, transition: `opacity .4s ease ${0.75 + i * 0.08}s` }}
+                animate={
+                  play
+                    ? { opacity: [0, 1, 1, 0.15, 0], y: [8, 0, 0, -2, 4] }
+                    : inView
+                      ? { opacity: 1, y: 0 }
+                      : { opacity: 0, y: 6 }
+                }
+                transition={
+                  play
+                    ? {
+                        duration: m.duration,
+                        times: m.times,
+                        ease: easeOut,
+                        repeat: Infinity,
+                        delay: m.delay,
+                      }
+                    : { duration: 0.3 }
+                }
               >
                 {total.toLocaleString("id-ID", { minimumFractionDigits: 1 })}
-              </span>
-              <div className="flex h-24 w-full max-w-[42px] flex-col-reverse overflow-hidden rounded-t-md shadow-sm">
-                <div className="w-full bg-slate-400" style={{ height: inView ? pct(nm) : "0%", transition: `height .75s cubic-bezier(.34,1.56,.64,1) ${i * 0.08}s` }} />
-                <div className="w-full bg-red-600" style={{ height: inView ? pct(fire) : "0%", transition: `height .75s cubic-bezier(.34,1.56,.64,1) ${0.04 + i * 0.08}s` }} />
-                <div className="w-full bg-[color:var(--accent-orange)]" style={{ height: inView ? pct(pd) : "0%", transition: `height .75s cubic-bezier(.34,1.56,.64,1) ${0.08 + i * 0.08}s` }} />
+              </motion.span>
+              <div className="flex h-24 w-full max-w-[42px] flex-col-reverse overflow-hidden rounded-t-md shadow-sm ring-1 ring-black/5">
+                {segments.map((seg) => (
+                  <motion.div
+                    key={seg.key}
+                    className={`w-full ${seg.color} origin-bottom will-change-[height]`}
+                    initial={{ height: "0%" }}
+                    animate={
+                      play
+                        ? { height: ["0%", pct(seg.h), pct(seg.h), "0%", "0%"] }
+                        : inView
+                          ? { height: pct(seg.h) }
+                          : { height: "0%" }
+                    }
+                    transition={
+                      play
+                        ? {
+                            duration: m.duration,
+                            times: m.times,
+                            ease: [0.22, 1, 0.36, 1],
+                            repeat: Infinity,
+                            delay: m.delay + seg.lag,
+                          }
+                        : { duration: 0.55, delay: i * 0.06, ease: easeOut }
+                    }
+                  />
+                ))}
               </div>
               <span className="absolute -bottom-5 whitespace-nowrap text-[8px] text-[color:var(--ink-soft)]">{label}</span>
-            </div>
+            </motion.div>
           );
         })}
       </div>
-    </div>
+    </motion.div>
+  );
+}
+
+function SummaryCard({
+  tone,
+  title,
+  items,
+  delay,
+}: {
+  tone: "good" | "gap";
+  title: string;
+  items: readonly string[];
+  delay: number;
+}) {
+  const { ref, inView } = useInView<HTMLDivElement>(0.2);
+  const isGood = tone === "good";
+
+  return (
+    <motion.div
+      ref={ref}
+      className={`rounded-lg border p-3.5 shadow-sm ${
+        isGood ? "border-emerald-200 bg-emerald-50/80" : "border-red-200 bg-red-50"
+      }`}
+      initial={{ opacity: 0, y: 22, scale: 0.97 }}
+      animate={inView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 22, scale: 0.97 }}
+      transition={{ delay, duration: 0.5, ease: easeOut }}
+      whileHover={{ y: -2, boxShadow: "0 8px 20px rgba(15,23,42,0.08)" }}
+    >
+      <div className="mb-2 flex items-center gap-2">
+        <motion.div
+          className={`grid h-6 w-6 place-items-center rounded-full text-[10px] font-black text-white ${
+            isGood ? "bg-[color:var(--green-mid)]" : "bg-red-600"
+          }`}
+          animate={
+            inView
+              ? isGood
+                ? { scale: [1, 1.12, 1] }
+                : { scale: [1, 1.1, 1], boxShadow: ["0 0 0 0 rgba(220,38,38,0.0)", "0 0 0 6px rgba(220,38,38,0.18)", "0 0 0 0 rgba(220,38,38,0.0)"] }
+              : {}
+          }
+          transition={{ delay: delay + 0.35, duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          {isGood ? "+" : "!"}
+        </motion.div>
+        <h4 className={`text-sm font-black ${isGood ? "text-[color:var(--ink)]" : "text-red-600"}`}>{title}</h4>
+      </div>
+      <ul className="space-y-1 text-[12px] text-[color:var(--ink)]">
+        {items.map((g, i) => (
+          <motion.li
+            key={g}
+            className="flex gap-2"
+            initial={{ opacity: 0, x: -10 }}
+            animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
+            transition={{ delay: delay + 0.2 + i * 0.08, duration: 0.35, ease: easeOut }}
+          >
+            <span className={isGood ? "text-[color:var(--green-mid)]" : "text-red-600"}>●</span>
+            {g}
+          </motion.li>
+        ))}
+      </ul>
+    </motion.div>
   );
 }
 
 export default function PanelA() {
   return (
-    <section className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-5">
-      <div className="mb-4 flex items-center gap-3">
-        <div className="sp-panel-badge">A</div>
+    <motion.section
+      className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-5"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.35 }}
+    >
+      <motion.div
+        className="mb-4 flex items-center gap-3"
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: easeOut }}
+      >
+        <motion.div
+          className="sp-panel-badge"
+          initial={{ scale: 0.6, rotate: -12 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 340, damping: 16, delay: 0.08 }}
+        >
+          A
+        </motion.div>
         <div>
           <h2 className="font-heading text-base font-black leading-tight text-[color:var(--ink)] md:text-lg">
             Safety Performance All Site YTD 2026
           </h2>
           <div className="text-[11px] text-[color:var(--ink-soft)]">Piramida · HIPO · Komposisi Kejadian</div>
         </div>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_1fr] lg:items-start">
-        <BradleyPyramid />
+        <motion.div
+          initial={{ opacity: 0, x: -16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.55, delay: 0.1, ease: easeOut }}
+        >
+          <BradleyPyramid />
+        </motion.div>
 
         <div className="flex min-w-0 flex-col gap-3">
-          <HipoChart />
+          <HipoTrend />
           <StackedBars />
         </div>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50/80 p-3.5">
-          <div className="mb-2 flex items-center gap-2">
-            <div className="grid h-6 w-6 place-items-center rounded-full bg-[color:var(--green-mid)] text-[10px] font-black text-white">+</div>
-            <h4 className="text-sm font-black text-[color:var(--ink)]">Good Record</h4>
-          </div>
-          <ul className="space-y-1 text-[12px] text-[color:var(--ink)]">
-            {GOOD_RECORD.map((g) => (
-              <li key={g} className="flex gap-2">
-                <span className="text-[color:var(--green-mid)]">●</span>
-                {g}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="rounded-lg border border-red-200 bg-red-50 p-3.5">
-          <div className="mb-2 flex items-center gap-2">
-            <div className="grid h-6 w-6 place-items-center rounded-full bg-red-600 text-[10px] font-black text-white">!</div>
-            <h4 className="text-sm font-black text-red-600">Gap</h4>
-          </div>
-          <ul className="space-y-1 text-[12px] text-[color:var(--ink)]">
-            {GAP_ITEMS.map((g) => (
-              <li key={g} className="flex gap-2">
-                <span className="text-red-600">●</span>
-                {g}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <SummaryCard tone="good" title="Good Record" items={GOOD_RECORD} delay={0.15} />
+        <SummaryCard tone="gap" title="Gap" items={GAP_ITEMS} delay={0.28} />
       </div>
-    </section>
+    </motion.section>
   );
 }

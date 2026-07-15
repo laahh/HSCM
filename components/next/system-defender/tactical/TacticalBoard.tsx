@@ -30,7 +30,7 @@ const PILLAR_ICON_PATHS: Record<string, string> = {
 
 function PillarIcon({ icon }: { icon: string }) {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="var(--tb-green-deep)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="var(--tb-green-deep)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d={PILLAR_ICON_PATHS[icon]} />
     </svg>
   );
@@ -45,6 +45,8 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
   const [speed, setSpeed] = useState(1);
   const [ballIndex, setBallIndex] = useState(0);
   const pitchRef = useRef<HTMLDivElement>(null);
+  const centerPanelRef = useRef<HTMLDivElement>(null);
+  const [panelHeight, setPanelHeight] = useState<number | null>(null);
 
   const activeTactic = useMemo(
     () => TACTICS.find((t) => t.id === activeTacticId) ?? TACTICS[0],
@@ -63,6 +65,24 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
     return () => clearInterval(timer);
   }, [activeTacticId, isPlaying, speed, activeTactic.ballPath]);
 
+  // match tactics sidebar to center panel height (desktop only)
+  useEffect(() => {
+    const el = centerPanelRef.current;
+    if (!el) return;
+    const sync = () => {
+      const isLg = window.matchMedia("(min-width: 1024px)").matches;
+      setPanelHeight(isLg ? el.getBoundingClientRect().height : null);
+    };
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    window.addEventListener("resize", sync);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", sync);
+    };
+  }, []);
+
   const ballPath = activeTactic.ballPath ?? [{ x: 50, y: 50 }];
   const ballPos = ballPath[ballIndex % ballPath.length];
 
@@ -78,19 +98,19 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
             <div className="flex items-center gap-3">
               <BerauCoalLogo height={44} className="rounded-md bg-white" />
               <div>
-                <div className="mono text-[11px] tracking-[0.25em] text-emerald-700">HSECM TINGKAT I</div>
-                <div className="font-heading text-sm font-semibold text-slate-800">
+                <div className="mono text-[14px] tracking-[0.25em] text-emerald-700">HSECM TINGKAT I</div>
+                <div className="font-heading text-base font-semibold text-slate-800">
                   Quarter 2 &middot; Tahun 2026 &middot; Tactical Board
                 </div>
               </div>
             </div>
 
-            <div className="mono hidden items-center gap-2 text-xs text-slate-500 md:flex">
+            <div className="mono hidden items-center gap-2 text-sm text-slate-500 md:flex">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-emerald-700">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> LIVE
               </span>
               <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-slate-600 shadow-sm">
-                FORMATION <span className="ml-1 text-emerald-700">{activeTactic.formation}</span>
+                FOCUS <span className="ml-1 text-emerald-700">{activeTactic.formation}</span>
               </span>
             </div>
 
@@ -98,7 +118,7 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
               <button
                 type="button"
                 onClick={() => setIsPlaying((p) => !p)}
-                className="tb-glass-strong flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 font-heading text-sm font-semibold text-slate-800 transition hover:border-emerald-400 hover:text-emerald-800"
+                className="tb-glass-strong flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 font-heading text-base font-semibold text-slate-800 transition hover:border-emerald-400 hover:text-emerald-800"
               >
                 {isPlaying ? (
                   <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
@@ -121,7 +141,7 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
                   setIsPlaying(true);
                   setActiveTacticId(TACTICS[0].id);
                 }}
-                className="tb-glass-strong flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 font-heading text-sm font-semibold text-slate-800 transition hover:border-amber-400 hover:text-amber-800"
+                className="tb-glass-strong flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 font-heading text-base font-semibold text-slate-800 transition hover:border-amber-400 hover:text-amber-800"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
@@ -133,7 +153,7 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
                 value={speed}
                 onChange={(e) => setSpeed(Number(e.target.value))}
                 aria-label="Kecepatan animasi"
-                className="tb-glass-strong cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2 font-heading text-sm font-semibold text-slate-800 outline-none"
+                className="tb-glass-strong cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2 font-heading text-base font-semibold text-slate-800 outline-none"
               >
                 <option value={0.5}>0.5&times;</option>
                 <option value={1}>1&times;</option>
@@ -148,16 +168,16 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
                 <span key={c} className="tb-swatch shadow-sm ring-1 ring-black/5" style={{ background: c }} />
               ))}
             </div>
-            <div className="mono mb-2 text-[10px] tracking-[0.4em] text-emerald-700/80">
+            <div className="mono mb-2 text-[13px] tracking-[0.4em] text-emerald-700/80">
               &mdash; ENHANCING OPERATION &ndash; HSE PERFORMANCE &mdash;
             </div>
-            <h1 className="font-heading text-xl font-extrabold leading-tight tracking-tight sm:text-2xl md:text-4xl">
+            <h1 className="font-heading text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl md:text-5xl">
               <span className="block text-slate-800">WE DEFEND THE SYSTEM,</span>
               <span className="mt-1 block bg-gradient-to-r from-emerald-600 via-green-600 to-lime-600 bg-clip-text text-transparent">
                 SO THE OPERATION CAN MOVE FORWARD SAFELY
               </span>
             </h1>
-            <div className="mono mt-2 text-[11px] tracking-[0.2em] text-slate-500 md:text-xs">
+            <div className="mono mt-2 text-[14px] tracking-[0.2em] text-slate-500 md:text-sm">
               Divisi berperan sebagai <span className="font-semibold text-slate-700">SYSTEM DEFENDER</span> dalam Sistem Bekerja Selamat
             </div>
             <div className="tb-title-underline mx-auto mt-3 max-w-3xl opacity-80" />
@@ -167,13 +187,13 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
 
       {/* main grid */}
       <main className="bg-white px-3 pb-10 md:px-6">
-        <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-4 lg:grid-cols-[240px_1fr_260px] lg:gap-5">
+        <div className="mx-auto grid max-w-[1600px] grid-cols-1 items-start gap-4 lg:grid-cols-[280px_1fr_300px] lg:gap-5">
           {/* left pillar sidebar */}
           <aside className="order-2 lg:order-1">
             <div className="tb-glass h-full rounded-xl border border-slate-200 bg-white p-3 md:p-4">
               <div className="mb-3 flex items-center justify-between">
-                <div className="mono text-[10px] tracking-[0.25em] text-emerald-700">PILLARS</div>
-                <div className="mono text-[10px] text-slate-400">4 CORE</div>
+                <div className="mono text-[13px] tracking-[0.25em] text-emerald-700">PILLARS</div>
+                <div className="mono text-[13px] text-slate-400">4 CORE</div>
               </div>
 
               <div className="tb-mobile-scroll-x flex gap-3 overflow-x-auto pb-1 lg:flex-col lg:overflow-x-visible">
@@ -182,17 +202,17 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
                     key={p.id}
                     type="button"
                     onClick={() => setActivePillar((cur) => (cur === p.id ? null : p.id))}
-                    className={`tb-pillar-card w-[170px] shrink-0 rounded-lg border border-slate-200 bg-white p-3 text-left lg:w-full lg:shrink ${
+                    className={`tb-pillar-card w-[200px] shrink-0 rounded-lg border border-slate-200 bg-white p-3 text-left lg:w-full lg:shrink ${
                       activePillar === p.id ? "tb-active-card" : ""
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-emerald-200 bg-gradient-to-br from-emerald-50 to-lime-50">
+                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-emerald-200 bg-gradient-to-br from-emerald-50 to-lime-50">
                         <PillarIcon icon={p.icon} />
                       </div>
                       <div className="min-w-0">
-                        <div className="font-heading text-sm font-bold text-slate-900">{p.title}</div>
-                        <div className="text-[11px] leading-snug text-slate-500">{p.desc}</div>
+                        <div className="font-heading text-base font-bold text-slate-900">{p.title}</div>
+                        <div className="text-[14px] leading-snug text-slate-500">{p.desc}</div>
                       </div>
                     </div>
                   </button>
@@ -200,8 +220,8 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
               </div>
 
               <div className="mt-4 border-t border-slate-200 pt-4">
-                <div className="mono mb-2 text-[10px] tracking-[0.25em] text-slate-400">LEGEND</div>
-                <ul className="space-y-1.5 text-[11px] text-slate-600">
+                <div className="mono mb-2 text-[13px] tracking-[0.25em] text-slate-400">LEGEND</div>
+                <ul className="space-y-1.5 text-[14px] text-slate-600">
                   <li className="flex items-center gap-2"><span className="tb-leg-line bg-slate-500" /> Koordinasi</li>
                   <li className="flex items-center gap-2"><span className="tb-leg-line" style={{ background: "var(--tb-lime-400)" }} /> Passing / Info flow</li>
                   <li className="flex items-center gap-2"><span className="tb-leg-line" style={{ background: "var(--tb-amber)" }} /> Movement / Intervention</li>
@@ -214,18 +234,19 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
 
           {/* center pitch */}
           <section className="order-1 lg:order-2">
-            <div className="tb-glass-strong relative rounded-xl border border-slate-200 bg-white p-3 md:p-4">
+            <div
+              ref={centerPanelRef}
+              className="tb-glass-strong relative rounded-xl border border-slate-200 bg-white p-3 md:p-4"
+            >
               <div className="mb-3 flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
                 <div className="flex items-center gap-2">
-                  <div className="mono text-[10px] tracking-[0.25em] text-emerald-700">ACTIVE TACTIC</div>
-                  <div className="font-heading text-sm font-bold text-slate-900">{activeTactic.title}</div>
+                  <div className="mono text-[13px] tracking-[0.25em] text-emerald-700">ACTIVE TACTIC</div>
+                  <div className="font-heading text-base font-bold text-slate-900">{activeTactic.title}</div>
                 </div>
-                <div className="mono text-[10px] text-slate-400">
-                  <span className="text-amber-700">{activeTactic.formation}</span>
-                  <span className="mx-2 text-slate-300">|</span>
-                  <span className="text-emerald-700">{`#${activeTactic.id}`}</span>
+                <div className="mono text-[15px] font-semibold text-amber-800">
+                  {activeTactic.formation}
                 </div>
-                <p className="w-full text-[12px] leading-snug text-slate-600">{activeTactic.centerMessage}</p>
+                <p className="w-full text-[15px] leading-snug text-slate-600">{activeTactic.centerMessage}</p>
               </div>
 
               <div className="relative w-full" style={{ aspectRatio: "16/10" }}>
@@ -273,20 +294,20 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
                           <div className="relative">
                             <div className={`absolute -inset-2 rounded-full ${isGK ? "bg-amber-400/25" : "bg-white/15"}`} />
                             <div
-                              className={`relative grid h-9 w-9 place-items-center rounded-full border-2 font-bold text-white shadow-lg md:h-10 md:w-10 ${
+                              className={`relative grid h-10 w-10 place-items-center rounded-full border-2 font-bold text-white shadow-lg md:h-11 md:w-11 ${
                                 isGK
                                   ? "border-amber-100 bg-gradient-to-br from-amber-300 to-amber-500"
                                   : "border-white/70 bg-gradient-to-br from-emerald-600 to-emerald-900"
                               }`}
                             >
-                              <span className="mono text-[11px] md:text-[12px]">{p.num}</span>
+                              <span className="mono text-[14px] md:text-[15px]">{p.num}</span>
                               {isGK && (
-                                <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full border border-amber-600 bg-white text-[9px] font-black text-amber-600">
+                                <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full border border-amber-600 bg-white text-[11px] font-black text-amber-600">
                                   C
                                 </span>
                               )}
                             </div>
-                            <div className="mono absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black/45 px-1.5 py-0.5 text-[9px] tracking-wider text-white/90">
+                            <div className="mono absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black/45 px-1.5 py-0.5 text-[11px] tracking-wider text-white/90">
                               {p.id.toUpperCase()}
                             </div>
                           </div>
@@ -309,15 +330,15 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
                   {/* tooltip */}
                   {hoveredMeta && hoveredNorm && (
                     <div
-                      className="tb-tooltip tb-glass-strong tb-show w-56 rounded-lg border border-emerald-200 px-3 py-2 text-[11px] shadow-lg"
+                      className="tb-tooltip tb-glass-strong tb-show w-64 rounded-lg border border-emerald-200 px-3 py-2 text-[14px] shadow-lg"
                       style={{ left: `${hoveredNorm.x}%`, top: `${hoveredNorm.y}%` }}
                     >
                       <div className="mb-1 flex items-center justify-between gap-2">
                         <div className="font-heading font-bold text-slate-900">{hoveredMeta.role}</div>
-                        <div className="mono text-[10px] text-emerald-700">{`#${hoveredMeta.num}`}</div>
+                        <div className="mono text-[13px] text-emerald-700">{`#${hoveredMeta.num}`}</div>
                       </div>
-                      <div className="text-[10px] leading-snug text-slate-600">{hoveredMeta.resp}</div>
-                      <div className="mono mt-1 border-t border-slate-200 pt-1 text-[10px] text-amber-700">
+                      <div className="text-[13px] leading-snug text-slate-600">{hoveredMeta.resp}</div>
+                      <div className="mono mt-1 border-t border-slate-200 pt-1 text-[13px] text-amber-700">
                         {`▸ ${activeTactic.title}: ${hoveredMeta.instr}`}
                       </div>
                     </div>
@@ -326,14 +347,14 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
               </div>
 
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                <div className="mono text-[10px] tracking-[0.25em] text-slate-400">
+                <div className="mono text-[13px] tracking-[0.25em] text-slate-400">
                   <span className="text-slate-700">
                     {selectedPlayer ? PLAYERS_META.find((p) => p.id === selectedPlayer)?.role : "No selection"}
                   </span>
                   <span className="mx-2 text-slate-300">&middot;</span>
                   <span className="text-emerald-700">{isPlaying ? `EXECUTING · ${activeTactic.title}` : "PAUSED"}</span>
                 </div>
-                <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                <div className="flex items-center gap-2 text-[14px] text-slate-500">
                   <span className="inline-flex items-center gap-1.5"><span className="tb-leg-dot" style={{ background: "var(--tb-amber)" }} /> Captain / GK</span>
                   <span className="inline-flex items-center gap-1.5"><span className="tb-leg-dot" style={{ background: "var(--tb-green-deep)" }} /> Outfield</span>
                   <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full border border-slate-300 bg-white" /> Ball</span>
@@ -342,14 +363,17 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
             </div>
           </section>
 
-          {/* right tactic sidebar */}
-          <aside className="order-3">
-            <div className="tb-glass h-full rounded-xl border border-slate-200 bg-white p-3 md:p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="mono text-[10px] tracking-[0.25em] text-emerald-700">TACTICS</div>
-                <div className="mono text-[10px] text-slate-400">6 PLAYS</div>
+          {/* right tactic sidebar — height matches center pitch panel */}
+          <aside
+            className="order-3 lg:min-h-0"
+            style={panelHeight ? { height: panelHeight } : undefined}
+          >
+            <div className="tb-glass flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-3 md:p-4">
+              <div className="mb-3 flex shrink-0 items-center justify-between">
+                <div className="mono text-[13px] tracking-[0.25em] text-emerald-700">TACTICS</div>
+                <div className="mono text-[13px] text-slate-400">6 PLAYS</div>
               </div>
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
+              <div className="tb-scroll-hidden grid min-h-0 flex-1 grid-cols-2 gap-3 overflow-y-auto lg:grid-cols-1">
                 {TACTICS.map((t) => (
                   <button
                     key={t.id}
@@ -360,11 +384,8 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="mono text-[10px] tracking-[0.2em] text-emerald-700">{`#${t.id.toUpperCase()}`}</div>
-                        <div className="font-heading text-sm font-bold leading-tight text-slate-900">{t.title}</div>
-                      </div>
-                      <div className="mono rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] text-amber-700">
+                      <div className="font-heading text-base font-bold leading-tight text-slate-900">{t.title}</div>
+                      <div className="mono shrink-0 rounded border border-amber-200 bg-amber-50 px-2 py-1 text-[15px] font-bold tracking-wide text-amber-800">
                         {t.formation}
                       </div>
                     </div>
@@ -377,7 +398,7 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
                         />
                       ))}
                     </div>
-                    <p className="mt-2 line-clamp-3 text-[11px] leading-snug text-slate-500">{t.desc}</p>
+                    <p className="mt-2 line-clamp-3 text-[14px] leading-snug text-slate-500">{t.desc}</p>
                   </button>
                 ))}
               </div>
@@ -387,14 +408,14 @@ export default function TacticalBoard({ onNext }: { onNext?: () => void }) {
       </main>
 
       <footer className="bg-white px-4 pb-8 text-center">
-        <div className="mono text-[10px] tracking-[0.3em] text-slate-400">
+        <div className="mono text-[13px] tracking-[0.3em] text-slate-400">
           HSECM TINGKAT I &middot; TACTICAL OPERATIONS &middot; QUARTER 2 TAHUN 2026
         </div>
         {onNext && (
           <button
             type="button"
             onClick={onNext}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-2.5 font-heading text-sm font-bold text-emerald-800 shadow-sm transition hover:border-emerald-400 hover:bg-emerald-100"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-2.5 font-heading text-base font-bold text-emerald-800 shadow-sm transition hover:border-emerald-400 hover:bg-emerald-100"
           >
             Lanjut: Safety Performance
             <span aria-hidden>→</span>

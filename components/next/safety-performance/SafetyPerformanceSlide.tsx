@@ -61,85 +61,102 @@ export default function SafetyPerformanceSlide({ onBack, onNext }: Props) {
   const active = TABS.find((t) => t.id === activeTab) ?? TABS[0];
 
   return (
-    <div className="sp-slide min-h-screen bg-[#f9fafb] text-[color:var(--ink)]">
+    <div className="sp-slide min-h-screen bg-white text-[color:var(--ink)]">
       <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-6">
-        {/* Header */}
+        {/* Masthead — one composition, no twin cards */}
         <motion.header
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
-          className="grid grid-cols-1 items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-[auto_1fr_auto] md:gap-6"
+          transition={{ duration: 0.5 }}
+          className="border-b border-[color:var(--green-line)] pb-5"
         >
-          <div className="flex items-center gap-3">
-            {onBack && (
-              <button
-                type="button"
-                onClick={onBack}
-                className="mr-1 rounded-lg border border-slate-200 px-2.5 py-2 text-[11px] font-semibold text-slate-600 transition hover:border-emerald-400 hover:text-emerald-800"
-              >
-                ←
-              </button>
-            )}
-            <div
-              className="grid h-14 w-14 shrink-0 place-items-center rounded-full shadow-md"
-              style={{ background: "radial-gradient(circle at 30% 30%, var(--green-mid), var(--green-deep))" }}
-            >
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="m9 12 2 2 4-4" />
-              </svg>
-            </div>
-            <div className="leading-tight">
-              <div className="text-[11px] font-bold tracking-[0.12em] text-[color:var(--green-mid)]">DIVISI · SYSTEM DEFENDER</div>
-              <div className="max-w-[220px] text-[11px] text-[color:var(--ink-soft)]">
-                Menjaga sistem, agar operasi tetap maju, aman, dan produktif
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              {onBack && (
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="grid h-8 w-8 place-items-center border border-slate-200 text-[13px] text-slate-500 transition hover:border-[color:var(--green-mid)] hover:text-[color:var(--green-deep)]"
+                  aria-label="Kembali"
+                >
+                  ←
+                </button>
+              )}
+              <div className="leading-tight">
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[color:var(--green-mid)]">
+                  Divisi · System Defender
+                </p>
+                <p className="mt-0.5 max-w-[280px] text-[11px] text-[color:var(--ink-soft)]">
+                  Menjaga sistem agar operasi tetap maju, aman, dan produktif
+                </p>
               </div>
             </div>
+
+            <div className="flex items-center gap-4">
+              <span className="text-[11px] font-bold tracking-wide text-red-600">
+                #SiagaSalingMenjaga
+              </span>
+              <div className="h-7 w-px bg-slate-200" aria-hidden />
+              <BerauCoalLogo height={32} />
+            </div>
           </div>
 
-          <div className="order-3 text-center md:order-2">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-              HSECM Tingkat I · Q2 2026
+          <div className="mt-6 flex flex-col gap-3 md:mt-7 md:flex-row md:items-end md:justify-between md:gap-8">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--ink-soft)]">
+                HSECM Tingkat I · Q2 2026
+              </p>
+              <h1 className="mt-1.5 font-heading text-[1.75rem] font-extrabold leading-[1.05] tracking-tight text-[color:var(--ink)] sm:text-3xl lg:text-[2.35rem]">
+                Safety Performance
+              </h1>
             </div>
-            <h1 className="mt-1 font-heading text-xl font-black leading-tight text-[color:var(--ink)] md:text-2xl lg:text-[28px]">
-              Safety Performance
-            </h1>
-            <p className="mt-1 text-[12px] text-[color:var(--ink-soft)]">{active.label}</p>
-          </div>
-
-          <div className="order-2 flex items-center justify-end gap-3 md:order-3">
-            <span className="rounded-full bg-red-600 px-3 py-1.5 text-[11px] font-bold tracking-wide text-white shadow-md">
-              #SiagaSalingMenjaga
-            </span>
-            <div className="border-l border-slate-200 pl-3">
-              <BerauCoalLogo height={36} />
-            </div>
+            <p className="max-w-md border-l-2 border-[color:var(--green-mid)] pl-3 text-[12px] leading-snug text-[color:var(--ink-soft)] md:text-right md:border-l-0 md:border-r-2 md:pl-0 md:pr-3">
+              {active.label}
+            </p>
           </div>
         </motion.header>
 
-        {/* Quote */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
+        {/* Briefing — asymmetric: key signals + narrative */}
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.08 }}
-          className="mt-4 rounded-xl border border-slate-200 border-l-4 border-l-[color:var(--green-mid)] bg-white p-4 pl-5 shadow-sm"
+          transition={{ duration: 0.5, delay: 0.06 }}
+          className="mt-5 grid grid-cols-1 gap-5 border-b border-[color:var(--green-line)] pb-5 md:grid-cols-[140px_1fr] md:gap-8"
+          aria-label="Ringkasan kinerja Q2"
         >
-          <p className="text-[13px] italic leading-relaxed text-[color:var(--ink)] md:text-sm">
-            &ldquo;Performance Q2 2026 masih mencatatkan terdapatnya kejadian berakibat ke pekerja yaitu{" "}
-            <strong className="not-italic text-red-600">2 Medical Treatment Injury</strong> dan{" "}
-            <strong className="not-italic text-red-600">Accident Non Injury meningkat 14%</strong>. Peningkatan 11%
-            kejadian pada Mitra Kerja Mine Contractor baik pada Aktivitas Core &amp; Support, terutama catatan kejadian
-            di PAMA, baik PAMA BMO dan PAMA GMO. Terdapat perulangan Insiden pada Aktivitas Support terutama di Area Pit
-            Service &amp; Maintenance.&rdquo;
-          </p>
-        </motion.div>
+          <div className="flex gap-4 md:flex-col md:gap-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[color:var(--ink-soft)]">
+                Fokus Q2
+              </p>
+              <p className="mt-1 font-heading text-2xl font-extrabold leading-none text-red-600">2</p>
+              <p className="mt-0.5 text-[11px] font-semibold leading-snug text-[color:var(--ink)]">
+                Medical Treatment Injury
+              </p>
+            </div>
+            <div className="w-px bg-slate-200 md:hidden" aria-hidden />
+            <div className="hidden h-px w-10 bg-slate-200 md:block" aria-hidden />
+            <div>
+              <p className="font-heading text-2xl font-extrabold leading-none text-red-600">+14%</p>
+              <p className="mt-0.5 text-[11px] font-semibold leading-snug text-[color:var(--ink)]">
+                Accident Non Injury
+              </p>
+            </div>
+          </div>
 
-        {/* Tabs */}
-        <nav
-          className="sp-tabs mt-5 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm"
-          aria-label="Safety Performance tabs"
-        >
-          <div className="flex min-w-max gap-1 md:min-w-0 md:grid md:grid-cols-4">
+          <p className="font-body text-[13px] leading-[1.65] text-[color:var(--ink)] md:text-sm">
+            Performance Q2 2026 masih mencatatkan terdapatnya kejadian berakibat ke pekerja yaitu{" "}
+            <strong className="font-semibold text-red-600">2 Medical Treatment Injury</strong> dan{" "}
+            <strong className="font-semibold text-red-600">Accident Non Injury meningkat 14%</strong>.
+            Peningkatan 11% kejadian pada Mitra Kerja Mine Contractor baik pada Aktivitas Core &amp; Support,
+            terutama catatan kejadian di PAMA, baik PAMA BMO dan PAMA GMO. Terdapat perulangan Insiden pada
+            Aktivitas Support terutama di Area Pit Service &amp; Maintenance.
+          </p>
+        </motion.section>
+
+        {/* Tabs — underline rail, not another card */}
+        <nav className="sp-tabs mt-5 overflow-x-auto border-b border-slate-200" aria-label="Safety Performance tabs">
+          <div className="flex min-w-max gap-0 md:min-w-0 md:grid md:grid-cols-4">
             {TABS.map((tab) => {
               const isActive = tab.id === activeTab;
               return (
@@ -149,17 +166,17 @@ export default function SafetyPerformanceSlide({ onBack, onNext }: Props) {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`sp-tab relative rounded-lg px-3 py-2.5 text-left transition ${
+                  className={`sp-tab relative px-3 py-3 text-left transition ${
                     isActive
-                      ? "bg-[color:var(--green-deep)] text-white shadow-sm"
-                      : "text-[color:var(--ink-soft)] hover:bg-slate-50 hover:text-[color:var(--ink)]"
+                      ? "text-[color:var(--green-deep)] after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:bg-[color:var(--green-deep)]"
+                      : "text-[color:var(--ink-soft)] hover:text-[color:var(--ink)]"
                   }`}
                 >
-                  <div className={`text-[12px] font-bold leading-snug md:text-[13px] ${isActive ? "text-white" : ""}`}>
+                  <div className={`text-[12px] font-bold leading-snug md:text-[13px]`}>
                     <span className="md:hidden">{tab.short}</span>
                     <span className="hidden md:inline">{tab.label}</span>
                   </div>
-                  <div className={`mt-0.5 text-[10px] leading-snug ${isActive ? "text-white/75" : "text-slate-400"}`}>
+                  <div className={`mt-0.5 text-[10px] leading-snug ${isActive ? "text-[color:var(--ink-soft)]" : "text-slate-400"}`}>
                     {tab.desc}
                   </div>
                 </button>
@@ -240,7 +257,7 @@ export default function SafetyPerformanceSlide({ onBack, onNext }: Props) {
               <BerauCoalLogo height={18} />
               <span>· HSECM Tingkat I · Q2 2026 ·</span>
             </span>{" "}
-            <span className="font-semibold text-[color:var(--green-mid)]">#SiagaSalingMenjaga</span>
+            <span className="font-semibold text-red-600">#SiagaSalingMenjaga</span>
           </div>
         </footer>
       </div>

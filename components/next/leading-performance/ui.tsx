@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { CountUp } from "./CountUp";
 import { useInView } from "../safety-performance/useInView";
 
@@ -59,48 +59,165 @@ export function Panel({
   );
 }
 
-/** 4-pillar board column — modern slate header + staggered body */
+/** 4-pillar board column — cover face flips open to reveal data */
+export type PillarTone = "accountability" | "people" | "process" | "technology";
+
+const PILLAR_THEME: Record<
+  PillarTone,
+  {
+    front: string;
+    header: string;
+    accent: string;
+    chip: string;
+    hint: string;
+    icon: string;
+  }
+> = {
+  accountability: {
+    front: "#166534",
+    header: "#166534",
+    accent: "#166534",
+    chip: "bg-white/15 text-white ring-white/25",
+    hint: "Klik untuk melihat data",
+    icon: "SA",
+  },
+  people: {
+    front: "#c2410c",
+    header: "#c2410c",
+    accent: "#c2410c",
+    chip: "bg-white/15 text-white ring-white/25",
+    hint: "Klik untuk melihat data",
+    icon: "PE",
+  },
+  process: {
+    front: "#3730a3",
+    header: "#3730a3",
+    accent: "#3730a3",
+    chip: "bg-white/15 text-white ring-white/25",
+    hint: "Klik untuk melihat data",
+    icon: "PR",
+  },
+  technology: {
+    front: "#0369a1",
+    header: "#0369a1",
+    accent: "#0369a1",
+    chip: "bg-white/15 text-white ring-white/25",
+    hint: "Klik untuk melihat data",
+    icon: "TE",
+  },
+};
+
 export function PillarColumn({
   title,
+  tone = "accountability",
   delay = 0,
   children,
   footer,
 }: {
   title: string;
+  tone?: PillarTone;
   delay?: number;
   children: ReactNode;
   footer: ReactNode;
 }) {
+  const [flipped, setFlipped] = useState(false);
+  const theme = PILLAR_THEME[tone];
+
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 28 }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.08 }}
-      transition={{ duration: 0.55, delay, ease: easeOut }}
-      className="lp-pillar flex min-h-0 flex-col overflow-hidden rounded-[12px] border border-slate-200/90 bg-gradient-to-b from-[#f3f7f3] via-white to-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+      transition={{ duration: 0.45, delay, ease: easeOut }}
+      className="lp-flip-scene min-h-[min(68vh,540px)]"
+      style={{ perspective: 1400 }}
     >
-      <header className="lp-pillar-header px-3 py-2.5 text-center">
-        <div className="relative z-[1] text-[12px] font-bold tracking-[0.04em] text-white md:text-[13px]">
-          {title}
-        </div>
-      </header>
-
       <motion.div
-        className="flex flex-1 flex-col gap-2.5 p-2.5 md:p-3"
-        variants={pillarStagger}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.15 }}
+        className="lp-flip-card relative h-full w-full"
+        style={{ transformStyle: "preserve-3d" }}
+        animate={{ rotateY: flipped ? 180 : 0 }}
+        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
       >
-        {children}
-        <motion.div
-          variants={pillarItem}
-          className="lp-footer-box mt-auto pl-3.5 text-[10px] leading-snug text-[color:var(--ink)] md:text-[11px]"
+        {/* FRONT — title cover */}
+        <button
+          type="button"
+          onClick={() => setFlipped(true)}
+          aria-label={`Buka ${title}`}
+          className="lp-flip-face absolute inset-0 flex cursor-pointer flex-col overflow-hidden rounded-xl border border-slate-200/80 text-left shadow-sm outline-none transition hover:shadow-md focus-visible:ring-2 focus-visible:ring-slate-400/40"
+          style={{
+            background: theme.front,
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            pointerEvents: flipped ? "none" : "auto",
+          }}
         >
-          {footer}
-        </motion.div>
+          <div className="relative z-[1] flex flex-1 flex-col items-center justify-center gap-4 px-5 py-8">
+            <span
+              className={`grid h-14 w-14 place-items-center rounded-xl text-base font-black tracking-wide ring-1 ${theme.chip}`}
+            >
+              {theme.icon}
+            </span>
+            <div className="text-center">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/60">
+                Leading
+              </div>
+              <h3 className="mt-2 font-heading text-xl font-black leading-tight text-white md:text-[22px]">
+                {title}
+              </h3>
+            </div>
+            <span className="mt-1 rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold tracking-wide text-white/90">
+              {theme.hint}
+            </span>
+          </div>
+        </button>
+
+        {/* BACK — data */}
+        <div
+          className="lp-flip-face absolute inset-0 flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+          style={{
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+            pointerEvents: flipped ? "auto" : "none",
+          }}
+        >
+          <header
+            className="relative flex shrink-0 items-center justify-between gap-2 px-3 py-2.5"
+            style={{ background: theme.header }}
+          >
+            <div className="text-[12px] font-bold tracking-[0.04em] text-white md:text-[13px]">
+              {title}
+            </div>
+            <button
+              type="button"
+              onClick={() => setFlipped(false)}
+              className="rounded-md border border-white/25 bg-white/10 px-2 py-0.5 text-[9px] font-bold text-white/90 transition hover:bg-white/20"
+              aria-label="Tutup data"
+            >
+              Tutup
+            </button>
+          </header>
+
+          {flipped && (
+            <motion.div
+              key="pillar-body"
+              className="lp-scroll-hidden flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto p-2.5 md:p-3"
+              variants={pillarStagger}
+              initial="hidden"
+              animate="show"
+            >
+              {children}
+              <motion.div
+                variants={pillarItem}
+                className="lp-footer-box mt-auto pl-3.5 text-[10px] leading-snug text-[color:var(--ink)] md:text-[11px]"
+              >
+                {footer}
+              </motion.div>
+            </motion.div>
+          )}
+        </div>
       </motion.div>
-    </motion.article>
+    </motion.div>
   );
 }
 

@@ -111,7 +111,7 @@ export const SCATTER: ScatterPoint[] = [
     q1: "K1",
     trans: "K1→K1",
     inc: "4 PD, 2 NM",
-    lead: 71.46,
+    lead: 75.46,
     sev: 0.62,
     leadQ1: 73.0,
     sevQ1: 0.3,

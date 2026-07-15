@@ -40,7 +40,7 @@ export function ZonesLayer({ tactic }: { tactic: Tactic }) {
               y={c.y - rPx - 6}
               textAnchor="middle"
               fill={ZONE_LABEL_COLOR[z.type]}
-              fontSize="11"
+              fontSize="14"
               fontFamily="JetBrains Mono, monospace"
               letterSpacing="2"
             >
@@ -156,7 +156,7 @@ export function RiskLayer({ tactic }: { tactic: Tactic }) {
           <g key={i}>
             <circle cx={p.x} cy={p.y} r="14" fill="url(#riskGrad)" className="tb-blink" />
             <circle cx={p.x} cy={p.y} r="4" fill="#e63946" />
-            <text x={p.x} y={p.y - 18} textAnchor="middle" fill="#fecaca" fontSize="10" fontFamily="JetBrains Mono, monospace" letterSpacing="1">
+            <text x={p.x} y={p.y - 18} textAnchor="middle" fill="#fecaca" fontSize="13" fontFamily="JetBrains Mono, monospace" letterSpacing="1">
               RISK
             </text>
           </g>
@@ -189,7 +189,7 @@ export function FxLayer({ tactic, pillar }: { tactic: Tactic; pillar: PillarId |
     elements.push(
       <g key="intercept" transform={`translate(${p.x} ${p.y})`}>
         <circle r="22" fill="rgba(34,197,94,0.25)" stroke="#22c55e" strokeWidth="2" className="tb-blink" />
-        <text y="4" textAnchor="middle" fill="#bbf7d0" fontSize="12" fontWeight="bold" fontFamily="JetBrains Mono, monospace">
+        <text y="4" textAnchor="middle" fill="#bbf7d0" fontSize="15" fontWeight="bold" fontFamily="JetBrains Mono, monospace">
           STOP
         </text>
       </g>
@@ -238,7 +238,7 @@ export function FxLayer({ tactic, pillar }: { tactic: Tactic; pillar: PillarId |
             <g key={i} transform={`translate(${p.x} ${p.y})`}>
               <circle r="10" fill="#0a3319" stroke="#a3e635" strokeWidth="1.5" />
               <path d="M -4 -3 L 4 -3 L 4 3 L -4 3 Z" fill="#a3e635" />
-              <text y="22" textAnchor="middle" fill="#bef264" fontSize="9" fontFamily="JetBrains Mono, monospace">
+              <text y="22" textAnchor="middle" fill="#bef264" fontSize="12" fontFamily="JetBrains Mono, monospace">
                 {`CAM${i + 1}`}
               </text>
             </g>
@@ -250,7 +250,7 @@ export function FxLayer({ tactic, pillar }: { tactic: Tactic; pillar: PillarId |
             <g transform={`translate(${c.x} ${c.y})`}>
               <rect x="-40" y="-26" width="80" height="52" rx="4" fill="#0a3319" stroke="#a3e635" strokeWidth="1.5" />
               <path d="M -32 -10 L -20 -18 L -8 -6 L 4 -14 L 16 -2 L 28 -10" fill="none" stroke="#a3e635" strokeWidth="1.5" />
-              <text y="18" textAnchor="middle" fill="#bef264" fontSize="9" fontFamily="JetBrains Mono, monospace">
+              <text y="18" textAnchor="middle" fill="#bef264" fontSize="12" fontFamily="JetBrains Mono, monospace">
                 ANALYTICS
               </text>
             </g>

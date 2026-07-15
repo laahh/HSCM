@@ -271,7 +271,7 @@ export default function RekayasaPerformanceSlide({ onBack, onNext }: Props) {
               onClick={onNext}
               className="rounded-full bg-[color:var(--green-deep)] px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-white shadow-md transition hover:bg-[color:var(--green-mid)]"
             >
-              Lanjut →
+              Lanjut: Highlight Summary & Enforcement →
             </button>
           )}
           <div>

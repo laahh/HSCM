@@ -7,9 +7,10 @@ import SystemDefenderSlide from "./system-defender/SystemDefenderSlide";
 import SafetyPerformanceSlide from "./safety-performance/SafetyPerformanceSlide";
 import LeadingPerformanceSlide from "./leading-performance/LeadingPerformanceSlide";
 import RekayasaPerformanceSlide from "./rekayasa/RekayasaPerformanceSlide";
+import SummaryEnforcementSlide from "./summary/SummaryEnforcementSlide";
 
 type Stage = "hero" | "intro" | "video" | "slide";
-type DeckPage = "tactical" | "performance" | "leading" | "rekayasa";
+type DeckPage = "tactical" | "performance" | "leading" | "rekayasa" | "summary";
 
 const FADE = { duration: 0.55, ease: [0.76, 0, 0.24, 1] as const };
 
@@ -136,7 +137,7 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
                       onNext={() => setDeckPage("rekayasa")}
                     />
                   </motion.div>
-                ) : (
+                ) : deckPage === "rekayasa" ? (
                   <motion.div
                     key="rekayasa"
                     className="min-h-full bg-white"
@@ -145,7 +146,21 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
                     exit={{ opacity: 0, y: -16 }}
                     transition={{ duration: 0.35 }}
                   >
-                    <RekayasaPerformanceSlide onBack={() => setDeckPage("leading")} />
+                    <RekayasaPerformanceSlide
+                      onBack={() => setDeckPage("leading")}
+                      onNext={() => setDeckPage("summary")}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="summary"
+                    className="min-h-full bg-white"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    transition={{ duration: 0.35 }}
+                  >
+                    <SummaryEnforcementSlide onBack={() => setDeckPage("rekayasa")} />
                   </motion.div>
                 )}
               </AnimatePresence>

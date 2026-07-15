@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import BerauCoalLogo from "../../brand/BerauCoalLogo";
 import { PILLARS, TACTICS } from "../system-defender/tactical/data";
 import { TACTIC_CARDS } from "../safety-performance/data";
@@ -17,11 +18,22 @@ const PILLAR_ICON: Record<string, string> = {
   technology: "T",
 };
 
-function ThemeIcon({ tone, title }: { tone: SummaryCard["tone"]; title: string }) {
-  const stroke = "#fff";
+const DOTS = [
+  "var(--dot-1)",
+  "var(--dot-2)",
+  "var(--dot-3)",
+  "var(--dot-4)",
+  "var(--dot-5)",
+  "var(--dot-6)",
+] as const;
+
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+function ThemeIcon({ title }: { title: string }) {
+  const stroke = "currentColor";
   if (title === "LEADERSHIP") {
     return (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8" aria-hidden>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8" aria-hidden>
         <circle cx="12" cy="8" r="3.5" />
         <path d="M5 20v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1" />
       </svg>
@@ -29,7 +41,7 @@ function ThemeIcon({ tone, title }: { tone: SummaryCard["tone"]; title: string }
   }
   if (title === "PEOPLE") {
     return (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8" aria-hidden>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8" aria-hidden>
         <circle cx="9" cy="8" r="2.5" />
         <circle cx="16" cy="9" r="2" />
         <path d="M3 19v-1a4 4 0 0 1 4-4h3" />
@@ -39,14 +51,14 @@ function ThemeIcon({ tone, title }: { tone: SummaryCard["tone"]; title: string }
   }
   if (title === "PROCESS") {
     return (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8" aria-hidden>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8" aria-hidden>
         <circle cx="12" cy="12" r="3" />
         <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2" />
       </svg>
     );
   }
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8" aria-hidden>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8" aria-hidden>
       <rect x="4" y="4" width="16" height="16" rx="2" />
       <path d="M9 9h6v6H9z" />
       <path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2" />
@@ -54,59 +66,79 @@ function ThemeIcon({ tone, title }: { tone: SummaryCard["tone"]; title: string }
   );
 }
 
-function SummaryRow({ card, delay }: { card: SummaryCard; delay: number }) {
-  const isGreen = card.tone === "green";
-  const headerBg = isGreen ? "bg-[color:var(--green-deep)]" : "bg-[#1e3a8a]";
-  const gapBorder = isGreen ? "border-emerald-300 bg-emerald-50/70" : "border-blue-300 bg-blue-50/70";
+function MetricDelta({ m }: { m: SummaryCard["metrics"][number] }) {
+  if (m.note) {
+    return (
+      <div className={`mt-0.5 text-[13px] font-extrabold ${m.bad ? "text-red-600" : "text-[color:var(--ink)]"}`}>
+        {m.note}
+      </div>
+    );
+  }
+  return (
+    <div className="mt-0.5 flex flex-wrap items-baseline gap-1.5 font-heading tabular-nums">
+      <span className="text-[13px] font-semibold text-slate-500">{m.from}</span>
+      <span className="text-[11px] text-slate-300">→</span>
+      <span className={`text-[18px] font-extrabold leading-none ${m.bad ? "text-red-600" : "text-[color:var(--green-deep)]"}`}>
+        {m.to}
+      </span>
+      <span className={`text-[10px] font-bold ${m.bad ? "text-red-500" : "text-[color:var(--green-mid)]"}`}>
+        {m.bad ? "↑" : "↑"}
+      </span>
+    </div>
+  );
+}
+
+function SummaryRow({ card, delay, reduceMotion }: { card: SummaryCard; delay: number; reduceMotion: boolean | null }) {
+  const accent = card.tone === "green" ? "var(--green-deep)" : "#1e3a8a";
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 12 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.4 }}
-      className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+      transition={{ delay, duration: 0.4, ease: EASE }}
+      className="border border-slate-200 bg-white"
     >
-      <header className={`${headerBg} flex items-center gap-2.5 px-3 py-2 text-white`}>
-        <span className="grid h-6 w-6 place-items-center rounded-full bg-white/20 text-[11px] font-black">
+      <header className="flex items-center gap-2.5 border-b border-slate-100 px-3 py-2.5" style={{ borderLeft: `3px solid ${accent}` }}>
+        <span
+          className="grid h-7 w-7 place-items-center font-heading text-[12px] font-extrabold text-white"
+          style={{ background: accent }}
+        >
           {card.n}
         </span>
-        <ThemeIcon tone={card.tone} title={card.title} />
-        <h3 className="text-[12px] font-extrabold tracking-wide">{card.title}</h3>
+        <span className="text-[color:var(--ink)]" style={{ color: accent }}>
+          <ThemeIcon title={card.title} />
+        </span>
+        <h3 className="text-[12px] font-extrabold tracking-[0.08em] text-[color:var(--ink)]">{card.title}</h3>
       </header>
 
-      <div className="grid grid-cols-1 gap-0 md:grid-cols-[1fr_1.1fr_1fr]">
-        <div className="space-y-2 border-b border-slate-100 p-3 md:border-b-0 md:border-r">
+      <div className="grid grid-cols-1 md:grid-cols-[0.95fr_1.15fr_0.95fr]">
+        <div className="space-y-2.5 border-b border-slate-100 p-3 md:border-b-0 md:border-r">
+          <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">Metrik Q1 → Q2</p>
           {card.metrics.map((m) => (
-            <div key={m.label} className="text-[11px] leading-snug">
-              <div className="font-semibold text-slate-500">{m.label}</div>
-              {m.note ? (
-                <div className={`mt-0.5 font-bold ${m.bad ? "text-red-600" : "text-[color:var(--ink)]"}`}>{m.note}</div>
-              ) : (
-                <div className="mt-0.5 flex flex-wrap items-center gap-1.5 font-bold tabular-nums">
-                  <span className="text-slate-600">{m.from}</span>
-                  <span className="text-slate-300">→</span>
-                  <span className={m.bad ? "text-red-600" : "text-emerald-700"}>{m.to}</span>
-                  {!m.bad && <span className="text-[10px] text-emerald-600">↑</span>}
-                  {m.bad && <span className="text-[10px] text-red-500">↑</span>}
-                </div>
-              )}
+            <div key={m.label}>
+              <div className="text-[10px] font-semibold text-slate-500">{m.label}</div>
+              <MetricDelta m={m} />
             </div>
           ))}
         </div>
 
         <div className="border-b border-slate-100 p-3 md:border-b-0 md:border-r">
-          <ul className="list-disc space-y-1.5 pl-3.5 text-[11px] leading-snug text-[color:var(--ink)]">
+          <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">Catatan</p>
+          <ul className="space-y-2">
             {card.notes.map((n) => (
-              <li key={n}>{n}</li>
+              <li key={n} className="flex gap-2 text-[11.5px] leading-snug text-[color:var(--ink)]">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-slate-400" aria-hidden />
+                {n}
+              </li>
             ))}
           </ul>
         </div>
 
         <div className="p-3">
-          <div className={`h-full rounded-lg border px-2.5 py-2 text-[11px] leading-snug ${gapBorder}`}>
-            <div className="mb-1 text-[10px] font-black uppercase tracking-wide text-slate-600">Gap:</div>
+          <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-red-500/80">Gap</p>
+          <p className="border border-red-200/80 bg-red-50/50 px-2.5 py-2 text-[11.5px] leading-snug text-[color:var(--ink)]">
             {card.gap}
-          </div>
+          </p>
         </div>
       </div>
     </motion.article>
@@ -118,211 +150,315 @@ function EnforcementBlock({
   tone,
   items,
   delay,
+  reduceMotion,
 }: {
   title: string;
   tone: "green" | "blue";
   items: readonly string[];
   delay: number;
+  reduceMotion: boolean | null;
 }) {
-  const side = tone === "green" ? "bg-[color:var(--green-deep)]" : "bg-[#1e3a8a]";
-  const ring = tone === "green" ? "border-emerald-300" : "border-blue-300";
-  const num = tone === "green" ? "bg-[color:var(--green-deep)]" : "bg-[#1e3a8a]";
-  const stripe = tone === "green" ? "bg-emerald-500/25" : "bg-blue-500/25";
+  const accent = tone === "green" ? "var(--green-deep)" : "#1e3a8a";
+  const soft = tone === "green" ? "bg-emerald-50/60" : "bg-blue-50/60";
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 14 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.45 }}
-      className={`relative overflow-hidden rounded-xl border bg-white shadow-sm ${ring}`}
+      transition={{ delay, duration: 0.45, ease: EASE }}
+      className="border border-slate-200 bg-white"
     >
-      <div className="pointer-events-none absolute right-3 top-3 flex gap-0.5">
-        {[0, 1, 2].map((i) => (
-          <span key={i} className={`h-5 w-1 rotate-12 rounded-full ${stripe}`} />
-        ))}
-      </div>
-
-      <div className="flex min-h-[180px]">
-        <div className={`${side} relative flex w-[72px] shrink-0 flex-col items-center justify-between px-2 py-4 text-white`}>
-          <div className="grid h-10 w-10 place-items-center rounded-full bg-white/15">
+      <header
+        className="flex items-center justify-between gap-3 px-3.5 py-3 text-white"
+        style={{ background: accent }}
+      >
+        <div className="flex items-center gap-2.5">
+          <span className="grid h-8 w-8 place-items-center bg-white/15">
             {tone === "green" ? (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 <path d="m9 12 2 2 4-4" />
               </svg>
             ) : (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5" />
-                <path d="m14 8 3-2 1 3" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
+                <path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z" />
               </svg>
             )}
+          </span>
+          <div>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/70">Enforcement</p>
+            <h3 className="font-heading text-[14px] font-extrabold tracking-wide">{title}</h3>
           </div>
-          <div
-            className="text-[12px] font-black tracking-[0.18em]"
-            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-          >
-            {title}
-          </div>
-          <div className={`absolute right-0 top-1/2 h-0 w-0 -translate-y-1/2 translate-x-full border-y-[8px] border-y-transparent border-l-[10px] ${tone === "green" ? "border-l-[color:var(--green-deep)]" : "border-l-[#1e3a8a]"}`} />
         </div>
+        <span className="font-heading text-[22px] font-black leading-none text-white/25">{items.length}</span>
+      </header>
 
-        <div className="flex-1 p-3.5 pr-8">
-          <ol className="space-y-0 divide-y divide-slate-100">
-            {items.map((item, i) => (
-              <li key={item} className="flex gap-2.5 py-2 first:pt-0 last:pb-0">
-                <span className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-black text-white ${num}`}>
-                  {i + 1}
-                </span>
-                <span className="text-[11.5px] leading-snug text-[color:var(--ink)]">{item}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </div>
+      <ol className={`divide-y divide-slate-100 ${soft}`}>
+        {items.map((item, i) => (
+          <motion.li
+            key={item}
+            initial={reduceMotion ? false : { opacity: 0, x: 8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: delay + 0.05 + i * 0.04, duration: 0.3 }}
+            className="flex gap-3 px-3.5 py-2.5"
+          >
+            <span
+              className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center text-[10px] font-extrabold text-white"
+              style={{ background: accent }}
+            >
+              {i + 1}
+            </span>
+            <span className="text-[12px] leading-snug text-[color:var(--ink)]">{item}</span>
+          </motion.li>
+        ))}
+      </ol>
     </motion.article>
   );
 }
 
 export default function SummaryEnforcementSlide({ onBack }: Props) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const reduceMotion = useReducedMotion();
+
   return (
-    <div className="sp-slide min-h-screen bg-[#f9fafb] text-[color:var(--ink)]">
-      <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-6">
-        <motion.header
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
-          className="grid grid-cols-1 items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-[auto_1fr_auto] md:gap-6"
-        >
-          <div className="flex items-center gap-3">
-            {onBack && (
-              <button
-                type="button"
-                onClick={onBack}
-                className="mr-1 rounded-lg border border-slate-200 px-2.5 py-2 text-[11px] font-semibold text-slate-600 transition hover:border-emerald-400 hover:text-emerald-800"
-              >
-                ←
-              </button>
-            )}
-            <div
-              className="grid h-14 w-14 shrink-0 place-items-center rounded-full shadow-md"
-              style={{ background: "radial-gradient(circle at 30% 30%, var(--green-mid), var(--green-deep))" }}
-            >
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="m9 12 2 2 4-4" />
-              </svg>
-            </div>
-            <div className="leading-tight">
-              <div className="text-[11px] font-bold tracking-[0.12em] text-[color:var(--green-mid)]">
-                DIVISI · SYSTEM DEFENDER
-              </div>
-              <div className="max-w-[220px] text-[11px] text-[color:var(--ink-soft)]">
-                Menjaga sistem, agar operasi tetap maju, aman, dan produktif
-              </div>
-            </div>
-          </div>
+    <div className="sp-slide relative min-h-screen overflow-hidden bg-white text-[color:var(--ink)]">
+      <motion.div
+        className="pointer-events-none absolute -right-24 -top-32 h-[420px] w-[420px] rounded-full border-[28px] border-[color:var(--green-deep)]/[0.05]"
+        aria-hidden
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.72 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.1, ease: EASE }}
+      />
+      <motion.div
+        className="pointer-events-none absolute -right-8 top-16 h-[280px] w-[280px] rounded-full border border-dashed border-[color:var(--green-mid)]/25"
+        aria-hidden
+        animate={reduceMotion ? { opacity: 1 } : { opacity: 1, rotate: 360 }}
+        transition={
+          reduceMotion
+            ? undefined
+            : { rotate: { duration: 48, repeat: Infinity, ease: "linear" }, opacity: { duration: 0.8 } }
+        }
+      />
 
-          <div className="order-3 text-center md:order-2">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-              HSECM Tingkat I · Q2 2026
-            </div>
-            <h1 className="mt-1 font-heading text-xl font-black leading-tight text-[color:var(--ink)] md:text-2xl lg:text-[26px]">
-              Highlight Summary &amp; Enforcement
-            </h1>
-            <p className="mt-1 text-[12px] text-[color:var(--ink-soft)]">
-              Lagging &amp; Leading · Stability · Transform
-            </p>
-          </div>
-
-          <div className="order-2 flex items-center justify-end gap-3 md:order-3">
-            <span className="rounded-full bg-red-600 px-3 py-1.5 text-[11px] font-bold tracking-wide text-white shadow-md">
-              #SiagaSalingMenjaga
-            </span>
-            <div className="border-l border-slate-200 pl-3">
-              <BerauCoalLogo height={36} />
-            </div>
-          </div>
-        </motion.header>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.08 }}
-          className="mt-4 rounded-xl border border-slate-200 border-l-4 border-l-[color:var(--green-mid)] bg-white p-4 pl-5 shadow-sm"
-        >
-          <p className="text-[13px] italic leading-relaxed text-[color:var(--ink)] md:text-sm">
-            &ldquo;{SUMMARY_QUOTE}&rdquo;
-          </p>
-        </motion.div>
-
-        <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[260px_1fr]">
-          <motion.aside
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.55, delay: 0.12 }}
-            className="space-y-3"
+      <div className="relative z-10 mx-auto max-w-[1600px] px-4 py-5 md:px-6 md:py-6">
+        <header>
+          <motion.div
+            className="flex flex-wrap items-center justify-between gap-3"
+            initial={reduceMotion ? false : { opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: EASE }}
           >
-            <div className="space-y-2.5">
-              {TACTIC_CARDS.map((t, i) => (
-                <div key={t.n} className="sp-tac-card flex items-start gap-3 p-3.5" title={TACTICS[i]?.centerMessage}>
-                  <div className="text-2xl font-black leading-none opacity-25">{t.n}</div>
-                  <div>
-                    <div className="text-[13px] font-bold tracking-wide">{t.title}</div>
-                    <div className="mt-1 text-[11px] leading-snug opacity-85">{t.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap gap-2 pt-1">
-              {PILLARS.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[color:var(--green-mid)]"
+            <div className="flex items-center gap-3">
+              {onBack && (
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="text-[12px] font-semibold text-[color:var(--ink-soft)] transition hover:text-[color:var(--green-deep)]"
+                  aria-label="Kembali"
                 >
-                  <span className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--green-mid)]/10 text-[9px] font-bold">
-                    {PILLAR_ICON[p.id]}
-                  </span>
-                  {p.title}
-                </div>
-              ))}
+                  ← Kembali
+                </button>
+              )}
+              <span className="hidden h-4 w-px bg-slate-200 sm:block" aria-hidden />
+              <div className="leading-tight">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[color:var(--green-mid)]">
+                  System Defender
+                </p>
+                <p className="text-[11px] text-[color:var(--ink-soft)]">
+                  Divisi · Operasi aman &amp; produktif
+                </p>
+              </div>
             </div>
-          </motion.aside>
+            <BerauCoalLogo height={34} />
+          </motion.div>
 
-          <main className="min-w-0">
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-              {/* Highlight Summary */}
-              <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <header className="bg-[#1e3a8a] px-4 py-2.5 text-center">
-                  <h2 className="text-[12px] font-extrabold tracking-wide text-white md:text-[13px]">
-                    HIGHLIGHT SUMMARY LAGGING &amp; LEADING
-                  </h2>
-                </header>
-                <div className="space-y-2.5 p-2.5 md:p-3">
+          <div className="mt-7 flex flex-col gap-6 lg:mt-8 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0">
+              <div className="mb-4 flex gap-2">
+                {DOTS.map((c, i) => (
+                  <motion.span
+                    key={c}
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: c }}
+                    initial={reduceMotion ? false : { opacity: 0, scale: 0, y: 8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ delay: 0.15 + i * 0.05, duration: 0.35, ease: EASE }}
+                  />
+                ))}
+              </div>
+              <motion.p
+                className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--ink-soft)]"
+                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.4, ease: EASE }}
+              >
+                HSECM Tingkat I · Q2 2026
+              </motion.p>
+              <h1 className="mt-2 overflow-hidden font-heading text-[clamp(1.85rem,3.6vw,2.9rem)] font-extrabold leading-[0.95] tracking-tight text-[color:var(--ink)]">
+                {["Highlight Summary", "& Enforcement"].map((word, i) => (
+                  <motion.span
+                    key={word}
+                    className="mr-[0.28em] inline-block"
+                    initial={reduceMotion ? false : { opacity: 0, y: "100%" }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.32 + i * 0.1, duration: 0.5, ease: EASE }}
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </h1>
+              <motion.p
+                className="mt-2 text-[13px] text-[color:var(--ink-soft)]"
+                initial={reduceMotion ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.35 }}
+              >
+                Lagging &amp; Leading · Stability · Transform
+              </motion.p>
+            </div>
+
+            <div className="relative flex shrink-0 items-center justify-end self-end pb-2 pt-1 lg:self-start lg:pt-4">
+              <motion.div
+                className="absolute -inset-8 rounded-full border border-dashed border-red-600/20"
+                aria-hidden
+                animate={reduceMotion ? undefined : { rotate: -360 }}
+                transition={reduceMotion ? undefined : { duration: 28, repeat: Infinity, ease: "linear" }}
+              />
+              <motion.span
+                className="sp-hash-stamp relative text-[12px] md:text-[13px]"
+                initial={reduceMotion ? false : { opacity: 0, scale: 1.3, rotate: -20 }}
+                animate={{ opacity: 1, scale: 1, rotate: -8 }}
+                transition={{ delay: 0.5, duration: 0.65, ease: EASE }}
+              >
+                #SiagaSalingMenjaga
+              </motion.span>
+            </div>
+          </div>
+
+          <motion.p
+            className="mt-6 max-w-4xl border-l-2 border-[color:var(--green-mid)] pl-4 font-body text-[13px] leading-[1.7] text-[color:var(--ink)] md:text-[14px]"
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55, duration: 0.45, ease: EASE }}
+          >
+            {SUMMARY_QUOTE}
+          </motion.p>
+        </header>
+
+        <div className="mt-7 flex items-center justify-between gap-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[color:var(--ink-soft)]">
+            {sidebarOpen ? "Taktik System Defender" : "Ringkasan penuh"}
+          </p>
+          <button
+            type="button"
+            onClick={() => setSidebarOpen((v) => !v)}
+            aria-expanded={sidebarOpen}
+            aria-controls="summary-tactic-sidebar"
+            className="inline-flex items-center gap-2 border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-bold tracking-wide text-[color:var(--ink)] transition hover:border-[color:var(--green-mid)] hover:text-[color:var(--green-deep)]"
+          >
+            <span aria-hidden className="font-heading text-[12px]">
+              {sidebarOpen ? "«" : "»"}
+            </span>
+            {sidebarOpen ? "Sembunyikan sidebar" : "Tampilkan sidebar"}
+          </button>
+        </div>
+
+        <div className="mt-3 flex flex-col gap-5 lg:flex-row">
+          <AnimatePresence initial={false}>
+            {sidebarOpen && (
+              <motion.aside
+                id="summary-tactic-sidebar"
+                key="summary-sidebar"
+                initial={reduceMotion ? false : { opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -16 }}
+                transition={{ duration: 0.28, ease: EASE }}
+                className="space-y-3 lg:w-[260px] lg:shrink-0"
+              >
+                <div className="space-y-2.5">
+                  {TACTIC_CARDS.map((t, i) => (
+                    <div
+                      key={t.n}
+                      className="sp-tac-card flex items-start gap-3 p-3.5"
+                      title={TACTICS[i]?.centerMessage}
+                    >
+                      <div className="text-2xl font-black leading-none opacity-25">{t.n}</div>
+                      <div>
+                        <div className="text-[13px] font-bold tracking-wide">{t.title}</div>
+                        <div className="mt-1 text-[11px] leading-snug opacity-85">{t.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {PILLARS.map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex items-center gap-1.5 border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[color:var(--green-mid)]"
+                    >
+                      <span className="grid h-4 w-4 place-items-center bg-[color:var(--green-mid)]/10 text-[9px] font-bold">
+                        {PILLAR_ICON[p.id]}
+                      </span>
+                      {p.title}
+                    </div>
+                  ))}
+                </div>
+              </motion.aside>
+            )}
+          </AnimatePresence>
+
+          <main className="min-w-0 flex-1">
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.08fr_0.92fr]">
+              <section>
+                <div className="mb-3 flex items-end justify-between gap-3 border-b border-slate-200 pb-2">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Lagging &amp; Leading</p>
+                    <h2 className="font-heading text-[15px] font-extrabold text-[color:var(--ink)] md:text-base">
+                      Highlight Summary
+                    </h2>
+                  </div>
+                  <span className="text-[11px] font-semibold text-[color:var(--ink-soft)]">
+                    {SUMMARY_CARDS.length} pilar
+                  </span>
+                </div>
+                <div className="space-y-3">
                   {SUMMARY_CARDS.map((card, i) => (
-                    <SummaryRow key={card.title} card={card} delay={0.14 + i * 0.06} />
+                    <SummaryRow
+                      key={card.title}
+                      card={card}
+                      delay={0.1 + i * 0.06}
+                      reduceMotion={reduceMotion}
+                    />
                   ))}
                 </div>
               </section>
 
-              {/* Enforcement */}
-              <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <header className="bg-[#1e3a8a] px-4 py-2.5 text-center">
-                  <h2 className="text-[12px] font-extrabold tracking-wide text-white md:text-[13px]">ENFORCEMENT</h2>
-                </header>
-                <div className="space-y-3 p-2.5 md:p-3">
+              <section>
+                <div className="mb-3 flex items-end justify-between gap-3 border-b border-slate-200 pb-2">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Tindak lanjut</p>
+                    <h2 className="font-heading text-[15px] font-extrabold text-[color:var(--ink)] md:text-base">
+                      Enforcement
+                    </h2>
+                  </div>
+                  <span className="text-[11px] font-semibold text-[color:var(--ink-soft)]">
+                    Stability · Transform
+                  </span>
+                </div>
+                <div className="space-y-3">
                   <EnforcementBlock
                     title={ENFORCEMENT.stability.title}
                     tone="green"
                     items={ENFORCEMENT.stability.items}
-                    delay={0.2}
+                    delay={0.18}
+                    reduceMotion={reduceMotion}
                   />
                   <EnforcementBlock
                     title={ENFORCEMENT.transform.title}
                     tone="blue"
                     items={ENFORCEMENT.transform.items}
                     delay={0.28}
+                    reduceMotion={reduceMotion}
                   />
                 </div>
               </section>
@@ -330,11 +466,11 @@ export default function SummaryEnforcementSlide({ onBack }: Props) {
           </main>
         </div>
 
-        <footer className="mt-6 py-4 text-center text-[11px] text-[color:var(--ink-soft)]">
+        <footer className="mt-8 py-4 text-center text-[11px] text-[color:var(--ink-soft)]">
           <span className="inline-flex items-center justify-center gap-2">
             <BerauCoalLogo height={18} />
             <span>· HSECM Tingkat I · Q2 2026 ·</span>
-            <span className="font-semibold text-[color:var(--green-mid)]">#SiagaSalingMenjaga</span>
+            <span className="font-semibold text-red-600">#SiagaSalingMenjaga</span>
           </span>
         </footer>
       </div>

@@ -122,12 +122,189 @@ export const NARRATIVE = {
 } as const;
 
 export const HIGHLIGHTS = [
-  { title: "Tidak menggunakan seatbelt", tone: "from-[#2d3e35] to-[#5a4a2a]" },
-  { title: "Pekerja berada di luar kabin", tone: "from-[#3a2e1e] to-[#6b4a2a]" },
-  { title: "LV melanggar rambu batas", tone: "from-[#2a3a4a] to-[#4a5a6a]" },
-  { title: "Pekerjaan tanpa pengamanan", tone: "from-[#4a3a2a] to-[#7a5a3a]" },
-  { title: "Dumping dengan ketinggian unit di bawah standar", tone: "from-[#3a4a3a] to-[#5a6a4a]" },
-  { title: "Modifikasi alat penyangga", tone: "from-[#5a3a2a] to-[#8a5a3a]" },
+  {
+    src: "/tbc1.png",
+    title: "Tidak menggunakan seatbelt",
+    kind: "GR" as const,
+  },
+  {
+    src: "/tbc2.png",
+    title: "Pekerja berada di luar kabin",
+    kind: "TBC" as const,
+  },
+  {
+    src: "/tbc3.png",
+    title: "LV melanggar rambu stop",
+    kind: "TBC" as const,
+  },
+  {
+    src: "/tbc4.png",
+    title: "Pekerjaan tanpa pengawasan",
+    kind: "TBC" as const,
+  },
+  {
+    src: "/tbc5.png",
+    title: "Dumping dengan beberapa unit berada di bawahnya",
+    kind: "TBC" as const,
+  },
+  {
+    src: "/tbc6.png",
+    title: "Modifikasi alat penyangga",
+    kind: "TBC" as const,
+  },
+];
+
+/** Highlight Gap Leading Performance Q2 — matrix (X = gap) */
+export const GAP_CONTRACTORS = [
+  "BUMA LMO",
+  "FAD LMO",
+  "MTN SMO",
+  "KDC BMO 1",
+  "BUMA BMO 1",
+  "MTL BMO 1",
+  "PAMA BMO 2",
+  "PAMA GMO",
+  "BAR BMO 3",
+] as const;
+
+export type GapPillar = {
+  id: string;
+  label: string;
+  incidents: string;
+  color: string;
+  headerBg: string;
+  headerFg: string;
+  rows: { metric: string; gaps: boolean[] }[];
+};
+
+export const GAP_MATRIX: GapPillar[] = [
+  {
+    id: "leadership",
+    label: "LEADERSHIP",
+    incidents: "20 Inc",
+    color: "#2563eb",
+    headerBg: "#60a5fa",
+    headerFg: "#0f172a",
+    rows: [
+      {
+        metric: "Weekly Ratio SAP < 24",
+        gaps: [true, true, false, false, false, false, true, false, true],
+      },
+      {
+        metric: "Weekly Ratio TBC < 5",
+        gaps: [true, false, true, true, true, true, true, false, true],
+      },
+      {
+        metric: "Blindspot TBC Meningkat",
+        gaps: [false, false, false, true, false, false, false, false, false],
+      },
+      {
+        metric: "Blindspot GR Meningkat",
+        gaps: [false, true, true, false, true, false, true, false, true],
+      },
+    ],
+  },
+  {
+    id: "people",
+    label: "PEOPLE",
+    incidents: "10 Inc",
+    color: "#d97706",
+    headerBg: "#fbbf24",
+    headerFg: "#0f172a",
+    rows: [
+      {
+        metric: "GR Berulang",
+        gaps: [false, false, true, false, false, false, true, false, false],
+      },
+      {
+        metric: "Rasio Kelayakan Kerja Menurun",
+        gaps: [true, true, false, true, true, true, true, false, true],
+      },
+      {
+        metric: "MFR Meningkat",
+        gaps: [false, true, true, false, false, false, true, true, false],
+      },
+      {
+        metric: "ASR Meningkat",
+        gaps: [false, false, true, false, false, false, true, true, false],
+      },
+      {
+        metric: "Fit to Work MCU Memburuk vs 2025 > 18%",
+        gaps: [true, false, true, true, true, false, false, true, false],
+      },
+    ],
+  },
+  {
+    id: "process",
+    label: "PROCESS",
+    incidents: "2 Inc",
+    color: "#16a34a",
+    headerBg: "#4ade80",
+    headerFg: "#0f172a",
+    rows: [
+      {
+        metric: "Aggregator FTW < 100%",
+        gaps: [true, true, true, true, false, true, true, true, false],
+      },
+      {
+        metric: "Implementasi IKK < 100%",
+        gaps: [false, true, true, false, false, false, true, false, false],
+      },
+      {
+        metric: "Golden Time < 100%",
+        gaps: [false, false, false, false, false, true, false, true, false],
+      },
+    ],
+  },
+  {
+    id: "technology",
+    label: "TECHNOLOGY",
+    incidents: "4 Inc",
+    color: "#7c3aed",
+    headerBg: "#c4b5fd",
+    headerFg: "#0f172a",
+    rows: [
+      {
+        metric: "Leadtime Entry Alert DMS On time < 70%",
+        gaps: [true, false, false, false, true, true, true, true, false],
+      },
+      {
+        metric: "Intervensi Alert DMS < 70%",
+        gaps: [false, true, true, false, false, true, false, true, false],
+      },
+    ],
+  },
+];
+
+export const GAP_NARRATIVE =
+  "Ketidaktercapaian leading yang diikuti terjadinya insiden mengindikasikan adanya gap laten atau sistemik yang belum terdeteksi dan diintervensi secara cepat.";
+
+/** @deprecated — diganti GAP_MATRIX */
+export const LEADING_GAPS = [
+  {
+    pillar: "Leadership",
+    title: "Pemenuhan SAP & Identifikasi TBC",
+    detail: "Ratio SAP dan TBC meningkat namun belum memenuhi ratio minimal secara Weekly. Blindspot GR naik 47% → 67%.",
+    tone: "bad" as const,
+  },
+  {
+    pillar: "People",
+    title: "Kontrol Perilaku & Kesehatan Pekerja",
+    detail: "Valid Golden Rules naik 120% (15 → 33). Pelanggaran Seatbelt tertinggi; perulangan di mitra kerja spesifik.",
+    tone: "bad" as const,
+  },
+  {
+    pillar: "Process",
+    title: "Fatigue Management & Pelaporan Emergency",
+    detail: "Aggregator FTW turun 99,5% → 97,6%. Golden Time turun 68% → 59%. Awareness pelaporan Emergency belum konsisten.",
+    tone: "bad" as const,
+  },
+  {
+    pillar: "Technology",
+    title: "Deviasi Implementasi Teknologi",
+    detail: "Gap pada DMS (close eyes) dan CCTV off/jarak jauh. Leadtime & intervensi alert masih perlu diperkuat.",
+    tone: "warn" as const,
+  },
 ];
 
 export const FTW_BELOW = ["All Minecont", "kecuali BUMA LMO (1% ±)", "BAR BMO 3"];
@@ -148,17 +325,71 @@ export const TECH_GAPS = [
   },
 ];
 
-export const BEARC_FLOW = ["RFID", "Data Hub", "SAP/HR/TBC", "Verifikasi"] as const;
+export const BEARC_SOURCES = [
+  { code: "RFID", desc: "Data tap personel" },
+  { code: "SAP", desc: "Data HR & kontraktor" },
+  { code: "TBC", desc: "Laporan temuan & hazard" },
+] as const;
+
+export const BEARC_FLOW = [
+  "Data tervalidasi",
+  "Pekerja terdeteksi banned",
+  "Akses kerja ditolak",
+  "Pekerja menjalankan treatment",
+  "Verifikasi treatment",
+  "Pekerja unbanned & dapat bekerja kembali",
+  "Loop monitoring berlanjut",
+] as const;
 
 export const BEARC_BREAKDOWN = [
   { label: "Banned RFID", value: 129 },
-  { label: "Banned RFID", value: 79 },
-  { label: "Lainnya", value: 75 },
+  { label: "Banned RFID & SAP", value: 79 },
+  { label: "Banned SAP", value: 75 },
 ];
 
 export const BEARC_IMPACT = [
-  { label: "Kategori A", value: 33, up: true },
-  { label: "Kategori B", value: 53, up: true },
-  { label: "Kategori C", value: 13, up: false },
-  { label: "Kategori D", value: 9, up: false },
+  { label: "Peningkatan SAP Report", value: 33, up: true },
+  { label: "Peningkatan TBC", value: 53, up: true },
+  { label: "Peningkatan Pelapor SAP", value: 13, up: true },
+  { label: "Peningkatan Pelapor TBC", value: 9, up: true },
 ];
+
+export const BEARC_NEXT = [
+  "Perluas implementasi ke divisi / departemen lain",
+  "Jaga kualitas sistem banned–unbanned agar konsisten dan andal",
+] as const;
+
+export const BEARC_NARRATIVE =
+  "Kontrol Peran sudah dijalankan untuk membantu meningkatkan partisipasi pekerja dalam rangka peningkatan performance Leading. Implementasi yang sudah berjalan sejak Week 27 pada Tim Safety & HSE baik di BC maupun Mitra Kerja berdampak pada peningkatan partisipasi pelaporan SAP & TBC.";
+
+export const RULE_FLOW = [
+  { step: "Deteksi Data", note: "Auto load data dari HSE Automation module" },
+  { step: "Trigger Rule", note: "Rule gap sesuai matrix" },
+  { step: "Assign Tasklist", note: "PIC follow-up gap sesuai matrix" },
+  { step: "Eksekusi & Tindak Lanjut", note: "Intervensi terukur" },
+  { step: "Verifikasi", note: "SOD BC verifikasi hasil perbaikan" },
+  { step: "Closed & Monitor Efektivitas", note: "Pantau efektivitas close" },
+] as const;
+
+export const RULE_MATRIX = [
+  "Partisipasi SAP L1 by RFID",
+  "Pemenuhan Coverage Area Kritis Daily",
+  "Blindspot TBC / GR",
+  "Overdue Hazard",
+  "Submitted Hazard > 24 jam",
+  "Jumlah IKK aktif dan ada pengecekan IPK-OKK",
+  "Pengisian Fit to Work",
+  "Fit to Work Merah",
+  "Implementasi IKK",
+  "Jumlah Pekerja Baru",
+] as const;
+
+export const RULE_OUTPUTS = [
+  "Early detection of emerging gaps",
+  "Measured and rapid intervention",
+  "Escalation of recurring gaps",
+  "Preventing latent gaps and fixing systemic gaps",
+] as const;
+
+export const RULE_NARRATIVE =
+  "Rule-based performance control hadir untuk mendeteksi deviasi lebih dini, memastikan tindak lanjut terukur, dan mencegah gap berkembang menjadi insiden.";

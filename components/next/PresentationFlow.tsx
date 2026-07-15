@@ -6,9 +6,10 @@ import IntroSequence from "@/components/intro/IntroSequence";
 import SystemDefenderSlide from "./system-defender/SystemDefenderSlide";
 import SafetyPerformanceSlide from "./safety-performance/SafetyPerformanceSlide";
 import LeadingPerformanceSlide from "./leading-performance/LeadingPerformanceSlide";
+import RekayasaPerformanceSlide from "./rekayasa/RekayasaPerformanceSlide";
 
 type Stage = "hero" | "intro" | "video" | "slide";
-type DeckPage = "tactical" | "performance" | "leading";
+type DeckPage = "tactical" | "performance" | "leading" | "rekayasa";
 
 const FADE = { duration: 0.55, ease: [0.76, 0, 0.24, 1] as const };
 
@@ -121,7 +122,7 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
                       onNext={() => setDeckPage("leading")}
                     />
                   </motion.div>
-                ) : (
+                ) : deckPage === "leading" ? (
                   <motion.div
                     key="leading"
                     className="min-h-full bg-white"
@@ -130,7 +131,21 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
                     exit={{ opacity: 0, y: -16 }}
                     transition={{ duration: 0.35 }}
                   >
-                    <LeadingPerformanceSlide onBack={() => setDeckPage("performance")} />
+                    <LeadingPerformanceSlide
+                      onBack={() => setDeckPage("performance")}
+                      onNext={() => setDeckPage("rekayasa")}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="rekayasa"
+                    className="min-h-full bg-white"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    transition={{ duration: 0.35 }}
+                  >
+                    <RekayasaPerformanceSlide onBack={() => setDeckPage("leading")} />
                   </motion.div>
                 )}
               </AnimatePresence>

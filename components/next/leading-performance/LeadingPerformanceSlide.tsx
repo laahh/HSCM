@@ -5,16 +5,17 @@ import { AnimatePresence, motion } from "framer-motion";
 import { PILLARS, TACTICS } from "../system-defender/tactical/data";
 import { TACTIC_CARDS } from "../safety-performance/data";
 import { LEADING_QUOTE } from "./data";
-import PanelLeadership from "./PanelLeadership";
-import PanelPeople from "./PanelPeople";
-import PanelProcess from "./PanelProcess";
-import PanelTechnology from "./PanelTechnology";
+import PanelLeading from "./PanelLeading";
+import PanelHighlightGrTbc from "./PanelHighlightGrTbc";
+import PanelHighlightGap from "./PanelHighlightGap";
+import PanelImprovementTeknologi from "./PanelImprovementTeknologi";
 
 type Props = {
   onBack?: () => void;
+  onNext?: () => void;
 };
 
-type TabId = "leadership" | "people" | "process" | "technology";
+type TabId = "leading" | "highlight-gr-tbc" | "highlight-gap" | "improvement-tech";
 
 const TABS: {
   id: TabId;
@@ -23,28 +24,28 @@ const TABS: {
   desc: string;
 }[] = [
   {
-    id: "leadership",
-    label: "Leadership · Supervisor Accountability",
-    short: "Leadership",
-    desc: "Weekly SAP · TBC · Blindspot",
+    id: "leading",
+    label: "Leading · Supervisor Accountability",
+    short: "Leading",
+    desc: "People · Process · Technology",
   },
   {
-    id: "people",
-    label: "People · Worker Management",
-    short: "People",
-    desc: "Golden Rules · Highlight",
+    id: "highlight-gr-tbc",
+    label: "Highlight GR & TBC",
+    short: "Highlight GR",
+    desc: "Dokumentasi temuan lapangan",
   },
   {
-    id: "process",
-    label: "Process · Working Plan & Implementation",
-    short: "Process",
-    desc: "FTW · IKK · Golden Time",
+    id: "highlight-gap",
+    label: "Highlight Gap Leading Performance Q2",
+    short: "Highlight Gap",
+    desc: "Gap per pilar · Catatan Q2",
   },
   {
-    id: "technology",
-    label: "Technology · Supporting Technology",
-    short: "Technology",
-    desc: "DMS Alert · BeARC",
+    id: "improvement-tech",
+    label: "Improvement Teknologi",
+    short: "Improvement",
+    desc: "BeARC · Rule-based Trigger",
   },
 ];
 
@@ -55,14 +56,13 @@ const PILLAR_ICON: Record<string, string> = {
   technology: "T",
 };
 
-export default function LeadingPerformanceSlide({ onBack }: Props) {
-  const [activeTab, setActiveTab] = useState<TabId>("leadership");
+export default function LeadingPerformanceSlide({ onBack, onNext }: Props) {
+  const [activeTab, setActiveTab] = useState<TabId>("leading");
   const active = TABS.find((t) => t.id === activeTab) ?? TABS[0];
 
   return (
     <div className="sp-slide lp-slide min-h-screen bg-[#f9fafb] text-[color:var(--ink)]">
       <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-6">
-        {/* Header — mirror Safety Performance */}
         <motion.header
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -119,7 +119,6 @@ export default function LeadingPerformanceSlide({ onBack }: Props) {
           </div>
         </motion.header>
 
-        {/* Quote */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,7 +130,6 @@ export default function LeadingPerformanceSlide({ onBack }: Props) {
           </p>
         </motion.div>
 
-        {/* Tabs */}
         <nav
           className="sp-tabs mt-5 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm"
           aria-label="Leading Performance tabs"
@@ -149,14 +147,18 @@ export default function LeadingPerformanceSlide({ onBack }: Props) {
                   className={`sp-tab relative rounded-lg px-3 py-2.5 text-left transition ${
                     isActive
                       ? "bg-[color:var(--green-deep)] text-white shadow-sm"
-                      : "text-[color:var(--ink-soft)] hover:bg-slate-50 hover:text-[color:var(--ink)]"
+                      : "text-[color:var(--green-deep)] hover:bg-emerald-50/60"
                   }`}
                 >
                   <div className={`text-[12px] font-bold leading-snug md:text-[13px] ${isActive ? "text-white" : ""}`}>
                     <span className="md:hidden">{tab.short}</span>
                     <span className="hidden md:inline">{tab.label}</span>
                   </div>
-                  <div className={`mt-0.5 text-[10px] leading-snug ${isActive ? "text-white/75" : "text-slate-400"}`}>
+                  <div
+                    className={`mt-0.5 text-[10px] leading-snug ${
+                      isActive ? "text-white/75" : "text-[color:var(--ink-soft)]"
+                    }`}
+                  >
                     {tab.desc}
                   </div>
                 </button>
@@ -165,7 +167,6 @@ export default function LeadingPerformanceSlide({ onBack }: Props) {
           </div>
         </nav>
 
-        {/* Body: sidebar + main */}
         <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[260px_1fr]">
           <motion.aside
             initial={{ opacity: 0, x: -20 }}
@@ -213,16 +214,25 @@ export default function LeadingPerformanceSlide({ onBack }: Props) {
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.28 }}
               >
-                {activeTab === "leadership" && <PanelLeadership />}
-                {activeTab === "people" && <PanelPeople />}
-                {activeTab === "process" && <PanelProcess />}
-                {activeTab === "technology" && <PanelTechnology />}
+                {activeTab === "leading" && <PanelLeading />}
+                {activeTab === "highlight-gr-tbc" && <PanelHighlightGrTbc />}
+                {activeTab === "highlight-gap" && <PanelHighlightGap />}
+                {activeTab === "improvement-tech" && <PanelImprovementTeknologi />}
               </motion.div>
             </AnimatePresence>
           </main>
         </div>
 
         <footer className="mt-6 flex flex-col items-center gap-3 py-4 text-center text-[11px] text-[color:var(--ink-soft)]">
+          {onNext && (
+            <button
+              type="button"
+              onClick={onNext}
+              className="rounded-full bg-[color:var(--green-deep)] px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-white shadow-md transition hover:bg-[color:var(--green-mid)]"
+            >
+              Lanjut: Pengendalian Risiko Rekayasa →
+            </button>
+          )}
           <div>
             PT Berau Coal · HSECM Tingkat I · Q2 2026 ·{" "}
             <span className="font-semibold text-[color:var(--green-mid)]">#SiagaSalingMenjaga</span>

@@ -10,13 +10,25 @@ type Series = {
   fill?: boolean;
 };
 
+type Guide = {
+  value: number;
+  color: string;
+};
+
 type Props = {
   labels: string[];
   series: Series[];
   height?: number;
   showLegend?: boolean;
   endLabels?: boolean;
+  guides?: Guide[];
+  yMin?: number;
+  yMax?: number;
 };
+
+function fmtId(n: number) {
+  return n.toLocaleString("id-ID", { maximumFractionDigits: 1, minimumFractionDigits: n % 1 ? 1 : 0 });
+}
 
 export function SparkLine({
   labels,
@@ -24,17 +36,20 @@ export function SparkLine({
   height = 140,
   showLegend = true,
   endLabels = true,
+  guides = [],
+  yMin,
+  yMax,
 }: Props) {
   const { ref, inView } = useInView<HTMLDivElement>(0.25);
   const w = 360;
   const h = height;
   const padL = 28;
-  const padR = 18;
-  const padT = 18;
+  const padR = 28;
+  const padT = 22;
   const padB = 22;
-  const all = series.flatMap((s) => s.values);
-  const min = Math.min(...all) * 0.92;
-  const max = Math.max(...all) * 1.05;
+  const all = [...series.flatMap((s) => s.values), ...guides.map((g) => g.value)];
+  const min = yMin ?? Math.min(...all) * 0.9;
+  const max = yMax ?? Math.max(...all) * 1.08;
   const sx = (i: number) => padL + (i / Math.max(1, labels.length - 1)) * (w - padL - padR);
   const sy = (v: number) => padT + (1 - (v - min) / (max - min || 1)) * (h - padT - padB);
 
@@ -44,83 +59,59 @@ export function SparkLine({
         <div className="mb-1 flex flex-wrap gap-3 text-[9px] font-semibold text-[color:var(--ink-soft)]">
           {series.map((s) => (
             <span key={s.label} className="inline-flex items-center gap-1.5">
-              <span
-                className="inline-block h-0.5 w-3 rounded"
-                style={{
-                  background: s.color,
-                  borderTop: s.dashed ? `1.5px dashed ${s.color}` : undefined,
-                  height: s.dashed ? 0 : 2,
-                }}
-              />
+              <span className="inline-block h-0.5 w-3 rounded" style={{ background: s.color }} />
               {s.label}
             </span>
           ))}
         </div>
       )}
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height }} aria-hidden={false} role="img">
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height }} role="img">
         {[0, 0.5, 1].map((t) => {
-          const v = min + (max - min) * (1 - t);
           const y = padT + t * (h - padT - padB);
-          return (
-            <g key={t}>
-              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke="var(--green-line)" />
-              <text x={padL - 4} y={y + 3} fontSize="8" fill="var(--ink-soft)" textAnchor="end">
-                {v.toFixed(0)}
-              </text>
-            </g>
-          );
+          return <line key={t} x1={padL} y1={y} x2={w - padR} y2={y} stroke="var(--green-line)" strokeOpacity="0.7" />;
         })}
+
+        {guides.map((g) => (
+          <line
+            key={`g-${g.value}-${g.color}`}
+            x1={padL}
+            y1={sy(g.value)}
+            x2={w - padR}
+            y2={sy(g.value)}
+            stroke={g.color}
+            strokeWidth="1.4"
+            strokeDasharray="5 4"
+            opacity={0.9}
+          />
+        ))}
 
         {series.map((s, si) => {
           let d = "";
           s.values.forEach((v, i) => {
             d += `${i === 0 ? "M" : "L"} ${sx(i)} ${sy(v)} `;
           });
-          const area =
-            s.fill && s.values.length
-              ? `${d} L ${sx(s.values.length - 1)} ${h - padB} L ${sx(0)} ${h - padB} Z`
-              : null;
           const last = s.values.length - 1;
           return (
             <g key={s.label}>
-              {area && (
-                <path
-                  d={area}
-                  fill={s.color}
-                  opacity={inView ? 0.12 : 0}
-                  style={{ transition: "opacity .7s ease" }}
-                />
-              )}
-              {s.dashed ? (
-                <path
-                  d={d}
-                  fill="none"
-                  stroke={s.color}
-                  strokeWidth={2}
-                  strokeDasharray="5 4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{
-                    opacity: inView ? 1 : 0,
-                    transition: `opacity .6s ease ${0.15 + si * 0.1}s`,
-                  }}
-                />
-              ) : (
-                <path
-                  d={d}
-                  fill="none"
-                  stroke={s.color}
-                  strokeWidth={2.4}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  pathLength={1}
-                  style={{
-                    strokeDasharray: 1,
-                    strokeDashoffset: inView ? 0 : 1,
-                    transition: `stroke-dashoffset 1.1s ease-out ${si * 0.12}s`,
-                  }}
-                />
-              )}
+              <path
+                d={d}
+                fill="none"
+                stroke={s.color}
+                strokeWidth={2.4}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeDasharray={s.dashed ? "5 4" : undefined}
+                pathLength={s.dashed ? undefined : 1}
+                style={
+                  s.dashed
+                    ? { opacity: inView ? 1 : 0, transition: `opacity .6s ease ${0.15 + si * 0.1}s` }
+                    : {
+                        strokeDasharray: 1,
+                        strokeDashoffset: inView ? 0 : 1,
+                        transition: `stroke-dashoffset 1.1s ease-out ${si * 0.12}s`,
+                      }
+                }
+              />
               {s.values.map((v, i) => (
                 <circle
                   key={`${s.label}-${i}`}
@@ -143,11 +134,11 @@ export function SparkLine({
                   fontSize="10"
                   fontWeight="800"
                   fill={s.color}
-                  textAnchor="middle"
+                  textAnchor="end"
                   opacity={inView ? 1 : 0}
                   style={{ transition: "opacity .4s ease .9s" }}
                 >
-                  {s.values[last]}
+                  {fmtId(s.values[last])}
                 </text>
               )}
             </g>

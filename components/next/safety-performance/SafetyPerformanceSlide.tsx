@@ -1,16 +1,52 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { PILLARS, TACTICS } from "../system-defender/tactical/data";
 import { TACTIC_CARDS } from "./data";
 import PanelA from "./PanelA";
 import PanelB from "./PanelB";
 import PanelC from "./PanelC";
+import PanelD from "./PanelD";
 
 type Props = {
   onBack?: () => void;
   onNext?: () => void;
 };
+
+type TabId = "all-site" | "rapor" | "profile" | "health";
+
+const TABS: {
+  id: TabId;
+  label: string;
+  short: string;
+  desc: string;
+}[] = [
+  {
+    id: "all-site",
+    label: "Safety Performance All Site YTD 2026",
+    short: "All Site YTD",
+    desc: "Piramida · HIPO · Komposisi Kejadian",
+  },
+  {
+    id: "rapor",
+    label: "Rapor Mining Kontraktor Q2 2026",
+    short: "Rapor Mining",
+    desc: "Kuadran · Pergerakan Q1 → Q2",
+  },
+  {
+    id: "profile",
+    label: "Profile Insiden Q2 2026",
+    short: "Profile Insiden",
+    desc: "Core vs Support · Tren · Insiden Berulang",
+  },
+  {
+    id: "health",
+    label: "Health Management Q2 2026",
+    short: "Health Management",
+    desc: "Fit to Work · Hasil MCU",
+  },
+];
 
 const PILLAR_ICON: Record<string, string> = {
   leadership: "L",
@@ -20,9 +56,12 @@ const PILLAR_ICON: Record<string, string> = {
 };
 
 export default function SafetyPerformanceSlide({ onBack, onNext }: Props) {
+  const [activeTab, setActiveTab] = useState<TabId>("all-site");
+  const active = TABS.find((t) => t.id === activeTab) ?? TABS[0];
+
   return (
     <div className="sp-slide min-h-screen bg-[#f9fafb] text-[color:var(--ink)]">
-      <div className="mx-auto max-w-[1440px] px-4 py-6 md:px-6">
+      <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-6">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: 20 }}
@@ -62,8 +101,9 @@ export default function SafetyPerformanceSlide({ onBack, onNext }: Props) {
               HSECM Tingkat I · Q2 2026 · PT Berau Coal
             </div>
             <h1 className="mt-1 font-heading text-xl font-black leading-tight text-[color:var(--ink)] md:text-2xl lg:text-[28px]">
-              Safety Performance PT Berau Coal | All Site Q2 2026
+              Safety Performance
             </h1>
+            <p className="mt-1 text-[12px] text-[color:var(--ink-soft)]">{active.label}</p>
           </div>
 
           <div className="order-2 flex items-center justify-end gap-3 md:order-3">
@@ -93,6 +133,40 @@ export default function SafetyPerformanceSlide({ onBack, onNext }: Props) {
             Service &amp; Maintenance.&rdquo;
           </p>
         </motion.div>
+
+        {/* Tabs */}
+        <nav
+          className="sp-tabs mt-5 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm"
+          aria-label="Safety Performance tabs"
+        >
+          <div className="flex min-w-max gap-1 md:min-w-0 md:grid md:grid-cols-4">
+            {TABS.map((tab) => {
+              const isActive = tab.id === activeTab;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`sp-tab relative rounded-lg px-3 py-2.5 text-left transition ${
+                    isActive
+                      ? "bg-[color:var(--green-deep)] text-white shadow-sm"
+                      : "text-[color:var(--ink-soft)] hover:bg-slate-50 hover:text-[color:var(--ink)]"
+                  }`}
+                >
+                  <div className={`text-[12px] font-bold leading-snug md:text-[13px] ${isActive ? "text-white" : ""}`}>
+                    <span className="md:hidden">{tab.short}</span>
+                    <span className="hidden md:inline">{tab.label}</span>
+                  </div>
+                  <div className={`mt-0.5 text-[10px] leading-snug ${isActive ? "text-white/75" : "text-slate-400"}`}>
+                    {tab.desc}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
 
         {/* Body */}
         <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[260px_1fr]">
@@ -134,13 +208,20 @@ export default function SafetyPerformanceSlide({ onBack, onNext }: Props) {
           </motion.aside>
 
           <main className="min-w-0">
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.05fr_1fr] xl:items-stretch">
-              <div className="xl:row-span-2">
-                <PanelA />
-              </div>
-              <PanelB />
-              <PanelC />
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.28 }}
+              >
+                {activeTab === "all-site" && <PanelA />}
+                {activeTab === "rapor" && <PanelB />}
+                {activeTab === "profile" && <PanelC />}
+                {activeTab === "health" && <PanelD />}
+              </motion.div>
+            </AnimatePresence>
           </main>
         </div>
 

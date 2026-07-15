@@ -320,6 +320,17 @@ body {
 .sp-slide {
   --paper-soft: #f5f8f5;
 }
+.sp-tabs {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sp-tabs::-webkit-scrollbar {
+  display: none;
+}
+.sp-tab:focus-visible {
+  outline: 2px solid var(--green-mid);
+  outline-offset: 2px;
+}
 .sp-panel-badge {
   width: 34px;
   height: 34px;
@@ -454,6 +465,77 @@ body {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.02); }
 }
+.lp-pillar {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.lp-pillar:hover {
+  transform: translateY(-4px);
+  border-color: rgba(31, 138, 68, 0.45) !important;
+  box-shadow: 0 12px 28px rgba(11, 61, 31, 0.1), 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+.lp-pillar-header {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #4b5563 0%, #374151 55%, #1f2937 100%);
+}
+.lp-pillar-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.14) 50%, transparent 60%);
+  transform: translateX(-120%);
+  animation: lp-headerShine 4.2s ease-in-out infinite;
+}
+@keyframes lp-headerShine {
+  0%, 60% { transform: translateX(-120%); }
+  80%, 100% { transform: translateX(120%); }
+}
+.lp-chart-card {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: linear-gradient(180deg, #ffffff 0%, #f8faf8 100%);
+  border-radius: 10px;
+  padding: 8px 8px 4px;
+}
+.lp-metric-card {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  padding: 8px 10px;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+.lp-metric-card:hover {
+  border-color: rgba(31, 138, 68, 0.4);
+  background: #fff;
+}
+.lp-meter-track {
+  height: 5px;
+  border-radius: 999px;
+  background: #e8eee8;
+  overflow: hidden;
+}
+.lp-meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  transform-origin: left center;
+}
+.lp-footer-box {
+  position: relative;
+  border-radius: 10px;
+  border: 1.5px solid var(--green-deep);
+  background: linear-gradient(180deg, #ffffff, #f4faf5);
+  padding: 10px 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+.lp-footer-box::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--green-mid);
+}
 .lp-table th {
   background: rgba(31, 138, 68, 0.1);
   color: var(--ink);
@@ -478,7 +560,11 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .lp-tactic-breathe,
-  .lp-flash {
+  .lp-flash,
+  .lp-pillar-header::after {
     animation: none !important;
+  }
+  .lp-pillar:hover {
+    transform: none;
   }
 }

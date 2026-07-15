@@ -90,7 +90,17 @@ export type ScatterPoint = {
   sev: number;
   leadQ1: number;
   sevQ1: number;
+  /** Short note for chart detail card */
   gap: string;
+  /** Gap related causal factors for rapor table */
+  gapCausal: string[];
+};
+
+export const QUAD_TABLE_DESC: Record<QuadKey, string> = {
+  K1: "Leading rendah, Gap Lagging",
+  K2: "Leading tinggi, Gap Lagging",
+  K3: "Leading rendah, Lagging relative terkendali",
+  K4: "Leading tinggi, Lagging relative terkendali",
 };
 
 /** Mining contractor scatter — Q2 current, Q1 prior for movement story */
@@ -106,6 +116,7 @@ export const SCATTER: ScatterPoint[] = [
     leadQ1: 73.0,
     sevQ1: 0.3,
     gap: "PD naik, severity memburuk",
+    gapCausal: ["Perilaku Pekerja", "Pengawasan", "Road Management", "Fatigue"],
   },
   {
     name: "PAMA GMO",
@@ -118,6 +129,7 @@ export const SCATTER: ScatterPoint[] = [
     leadQ1: 75.0,
     sevQ1: 0.28,
     gap: "MTI berulang, severity naik",
+    gapCausal: ["Metode Kerja Tidak Standar", "Perilaku Pekerja", "Pengawasan", "Area Kerja", "Tools"],
   },
   {
     name: "MTN",
@@ -130,6 +142,7 @@ export const SCATTER: ScatterPoint[] = [
     leadQ1: 73.0,
     sevQ1: 0.45,
     gap: "Zero incident — lompat kuadran",
+    gapCausal: [],
   },
   {
     name: "MTL",
@@ -142,6 +155,7 @@ export const SCATTER: ScatterPoint[] = [
     leadQ1: 76.2,
     sevQ1: 0.27,
     gap: "NM sporadis — relatif stabil",
+    gapCausal: ["Pengoperasian Unit"],
   },
   {
     name: "BUMA LMO",
@@ -154,6 +168,7 @@ export const SCATTER: ScatterPoint[] = [
     leadQ1: 75.0,
     sevQ1: 0.5,
     gap: "Membaik dari K1",
+    gapCausal: ["Perilaku Pekerja"],
   },
   {
     name: "BAR",
@@ -166,6 +181,7 @@ export const SCATTER: ScatterPoint[] = [
     leadQ1: 80.0,
     sevQ1: 0.1,
     gap: "Turun dari K4 — PD & NM",
+    gapCausal: ["Pengoperasian Unit", "Tools"],
   },
   {
     name: "FAD",
@@ -178,6 +194,7 @@ export const SCATTER: ScatterPoint[] = [
     leadQ1: 80.1,
     sevQ1: 0.14,
     gap: "Tetap Baik — NM rendah",
+    gapCausal: ["Pengawasan", "Pengoperasian Unit"],
   },
   {
     name: "KDC",
@@ -190,6 +207,7 @@ export const SCATTER: ScatterPoint[] = [
     leadQ1: 83.2,
     sevQ1: 0.13,
     gap: "Tetap Baik — PD tunggal",
+    gapCausal: ["Maintenance"],
   },
   {
     name: "BUMA BMO",
@@ -202,6 +220,7 @@ export const SCATTER: ScatterPoint[] = [
     leadQ1: 80.0,
     sevQ1: 0.3,
     gap: "Naik ke Baik — zero incident",
+    gapCausal: [],
   },
 ];
 
@@ -212,20 +231,187 @@ export const PREV_POS: Record<string, { lead: number; sev: number }> = Object.fr
 
 export const TREND = {
   labels: ["Q1'25", "Q2'25", "Q3'25", "Q4'25", "Q1'26", "Q2'26"],
+  /** Blue triangles — Core */
   coreSolid: [4.3, 3.0, 3.3, 4.0, 2.7, 3.0],
+  /** Grey squares — Core */
   coreDash: [0.3, 0.0, 1.0, 1.3, 0.7, 0.3],
-  supDash: [4.3, 6.0, 6.0, 2.0, 4.0, 3.3],
+  /** Blue triangles — Support */
   supSolid: [3.0, 2.3, 2.7, 2.0, 3.0, 3.3],
+  /** Grey squares — Support */
+  supDash: [4.3, 6.0, 6.0, 2.0, 4.0, 3.3],
 };
 
+/** Stacked composition bars — Profile Insiden (exact % from source) */
+export const COMPOSITION = {
+  coreSupport: {
+    title: "Core vs Support",
+    legend: [
+      { label: "Core", bg: "#2f6fb5" },
+      { label: "Support", bg: "#f0c419" },
+    ],
+    years: [
+      {
+        label: "AVG 2025",
+        total: 11.5,
+        segments: [
+          { key: "Core", pct: 38, label: "38%", bg: "#2f6fb5", fg: "#fff" },
+          { key: "Support", pct: 62, label: "62%", bg: "#f0c419", fg: "#5a4400" },
+        ],
+      },
+      {
+        label: "AVG 2026",
+        total: 10.2,
+        segments: [
+          { key: "Core", pct: 33, label: "33%", bg: "#2f6fb5", fg: "#fff" },
+          { key: "Support", pct: 67, label: "67%", bg: "#f0c419", fg: "#5a4400" },
+        ],
+      },
+    ],
+  },
+  minecont: {
+    title: "Minecont vs Non Minecont",
+    legend: [
+      { label: "Minecont", bg: "#3d4f63" },
+      { label: "Non Minecont", bg: "#9ca3af" },
+    ],
+    years: [
+      {
+        label: "AVG 2025",
+        total: 11.5,
+        segments: [
+          { key: "Minecont", pct: 54, label: "54%", bg: "#3d4f63", fg: "#fff" },
+          { key: "Non", pct: 46, label: "46%", bg: "#9ca3af", fg: "#fff" },
+        ],
+      },
+      {
+        label: "AVG 2026",
+        total: 10.2,
+        segments: [
+          { key: "Minecont", pct: 59, label: "59%", bg: "#3d4f63", fg: "#fff" },
+          { key: "Non", pct: 41, label: "41%", bg: "#9ca3af", fg: "#fff" },
+        ],
+      },
+    ],
+  },
+} as const;
+
 export const ACTIVITY = [
-  { label: "Pit Service (PAMA BMO 2)", color: "var(--accent-orange)", vals: [0.3, 0.0, 0.7], type: "Non Injury" },
-  { label: "Maintenance (PAMA GMO)", color: "#d92b2b", vals: [0.3, 0.0, 0.7], type: "Injury" },
+  {
+    title: "Pit Service",
+    company: "(PAMA BMO 2)",
+    color: "#f59e0b",
+    vals: [0.3, 0.0, 0.7] as const,
+    type: "Non Injury" as const,
+  },
+  {
+    title: "Maintenance",
+    company: "(PAMA GMO)",
+    color: "#dc2626",
+    vals: [0.3, 0.0, 0.7] as const,
+    type: "Injury" as const,
+  },
 ];
 
 export const INCIDENT_NOTES = [
-  "Kaca Kabin Grader 502 pecah terkena lentingan material",
-  "Kaca Kabin Dozer 1212 pecah terkena lentingan material",
-  "Jari tangan kiri pekerja terkena pukulan hammer saat maintenance unit",
-  "Tangan pekerja terjepit Final Drive saat aktivitas cleaning sparepart",
-];
+  {
+    src: "/grader1.png",
+    alt: "Grader 502",
+    caption: "Kaca Kabin Grader 502 pecah terkena lentingan material",
+  },
+  {
+    src: "/grader2.png",
+    alt: "Dozer 1212",
+    caption: "Kaca Kabin Dozer 1212 pecah terkena lentingan material",
+  },
+  {
+    src: "/grader4.png",
+    alt: "Maintenance hammer",
+    caption: "Jari tangan kiri pekerja terkena pukulan hammer saat maintenance unit",
+  },
+  {
+    src: "/grader3.png",
+    alt: "Final Drive cleaning",
+    caption: "Tangan pekerja terjepit Final Drive saat aktivitas cleaning sparepart",
+  },
+] as const;
+
+export const FIT_TO_WORK_KPIS = {
+  penurunan: 18,
+  penurunanLabel: "Penurunan hasil MCU (Kelayakan Kerja)",
+  peningkatan: 19,
+  peningkatanLabel: "Peningkatan hasil MCU (Kelayakan Kerja)",
+} as const;
+
+/** Fit to Work MCU — Health Management Q2 2026. gap.* = peach highlight vs Q1. */
+export const FIT_TO_WORK = [
+  {
+    company: "MTL",
+    rasio: "90.7%",
+    mfr: "6.01",
+    asr: "0",
+    gap: { rasio: true, mfr: true, asr: false },
+  },
+  {
+    company: "BUMA LMO",
+    rasio: "95.1%",
+    mfr: "188.77",
+    asr: "98.02",
+    gap: { rasio: true, mfr: true, asr: true },
+  },
+  {
+    company: "BUMA BMO",
+    rasio: "70.4%",
+    mfr: "3.50",
+    asr: "3.50",
+    gap: { rasio: true, mfr: true, asr: true },
+  },
+  {
+    company: "PAMA BMO",
+    rasio: "80.8%",
+    mfr: "74.53",
+    asr: "6.82",
+    gap: { rasio: true, mfr: true, asr: true },
+  },
+  {
+    company: "PAMA GMO",
+    rasio: "96.6%",
+    mfr: "141.18",
+    asr: "1.43",
+    gap: { rasio: false, mfr: true, asr: true },
+  },
+  {
+    company: "MTN",
+    rasio: "90.9%",
+    mfr: "69.52",
+    asr: "68.45",
+    gap: { rasio: false, mfr: true, asr: true },
+  },
+  {
+    company: "KDC BMO",
+    rasio: "89.3%",
+    mfr: "0",
+    asr: "0",
+    gap: { rasio: true, mfr: false, asr: false },
+  },
+  {
+    company: "KDC GMO",
+    rasio: "90.3%",
+    mfr: "0",
+    asr: "0",
+    gap: { rasio: true, mfr: false, asr: false },
+  },
+  {
+    company: "FAD LMO",
+    rasio: "99.0%",
+    mfr: "37.59",
+    asr: "0",
+    gap: { rasio: false, mfr: true, asr: false },
+  },
+  {
+    company: "BAR",
+    rasio: "97.6%",
+    mfr: "0",
+    asr: "0",
+    gap: { rasio: true, mfr: false, asr: false },
+  },
+] as const;

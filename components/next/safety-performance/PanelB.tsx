@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SCATTER, type QuadKey, type ScatterPoint } from "./data";
 import { useInView } from "./useInView";
+import ContractorRaporTable from "./ContractorRaporTable";
 
 const Q_META: Record<
   QuadKey,
@@ -209,10 +210,10 @@ export default function PanelB() {
           <div className="sp-panel-badge">B</div>
           <div>
             <h2 className="font-heading text-base font-black leading-tight text-[color:var(--ink)] md:text-lg">
-              Performance Mining Contractor
+              Rapor Mining Kontraktor Q2 2026
             </h2>
             <div className="text-[11px] text-[color:var(--ink-soft)]">
-              Pergerakan Q1 → Q2 · % Leading vs Lagging Severity
+              Kuadran · Pergerakan Q1 → Q2 · % Leading vs Lagging Severity
             </div>
           </div>
         </div>
@@ -336,7 +337,8 @@ export default function PanelB() {
         </div>
       </div>
 
-      <div className="qb-stage relative min-h-0 flex-1 overflow-hidden rounded-2xl border border-slate-200/90">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] xl:items-stretch">
+      <div className="qb-stage relative min-h-0 overflow-hidden rounded-2xl border border-slate-200/90">
         <div className="pointer-events-none absolute inset-0 qb-grid-fade" aria-hidden />
 
         <div className="pointer-events-none absolute left-2 top-1/2 z-[1] hidden -translate-y-1/2 -rotate-90 text-[9px] font-bold tracking-[0.18em] text-slate-400 sm:block">
@@ -792,6 +794,9 @@ export default function PanelB() {
             )}
           </AnimatePresence>
         </div>
+      </div>
+
+      <ContractorRaporTable />
       </div>
     </section>
   );

@@ -150,11 +150,13 @@ export default function PanelA() {
         </div>
       </div>
 
-      <BradleyPyramid />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_1fr] lg:items-start">
+        <BradleyPyramid />
 
-      <div className="mt-4 grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
-        <HipoChart />
-        <StackedBars />
+        <div className="flex min-w-0 flex-col gap-3">
+          <HipoChart />
+          <StackedBars />
+        </div>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">

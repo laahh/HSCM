@@ -22,6 +22,25 @@ export const TACTIC_MINIS = [
   },
 ] as const;
 
+/** Sidebar tactic cards — same pattern as Safety Performance */
+export const LEADING_TACTIC_CARDS = [
+  {
+    n: "01",
+    title: "MAINTAIN SHAPE",
+    desc: "Menjaga struktur & jarak pengendalian agar tidak ada celah pada Leading Performance.",
+  },
+  {
+    n: "02",
+    title: "DIRECT THE TEAM",
+    desc: "Komunikasi, arahan, dan pengingat agar supervisor & pekerja berada pada posisi yang benar.",
+  },
+  {
+    n: "03",
+    title: "INTERCEPT EARLY",
+    desc: "Intersepsi dini gap SAP/TBC, Golden Rules, Fatigue, dan alert teknologi sebelum menjadi lagging.",
+  },
+] as const;
+
 export const SAP_WEEKS = [
   "W14",
   "W15",
@@ -38,10 +57,18 @@ export const SAP_WEEKS = [
   "W26",
 ];
 
-export const SAP_BC = [18.2, 19.1, 20.4, 21.0, 19.8, 22.1, 21.5, 23.0, 22.4, 24.1, 22.8, 23.2, 23.6];
-export const SAP_MK = [17.5, 18.0, 19.2, 18.8, 20.1, 19.5, 21.0, 20.3, 21.8, 20.9, 21.4, 20.5, 20.7];
-export const TBC_RATIO = [4.1, 4.8, 5.2, 5.5, 5.9, 6.1, 6.4, 6.0, 6.7, 6.9, 7.0, 6.8, 7.2];
+export const SAP_BC = [16.8, 17.2, 17.9, 18.5, 18.1, 18.8, 19.2, 19.6, 19.0, 19.8, 20.1, 20.4, 20.7];
+export const SAP_MK = [18.2, 19.0, 19.8, 20.5, 20.1, 21.0, 21.4, 22.0, 21.6, 22.4, 22.8, 23.1, 23.5];
+export const SAP_MIN_BC = 19;
+export const SAP_MIN_MK = 24;
 
+/** Weekly Ratio TBC — BC (green) & MK (orange) */
+export const TBC_BC = [4.1, 4.8, 5.2, 5.5, 5.9, 6.1, 6.4, 6.0, 6.7, 6.9, 7.0, 6.8, 7.2];
+export const TBC_MK = [2.8, 3.0, 3.2, 3.1, 3.4, 3.3, 3.6, 3.4, 3.5, 3.3, 3.4, 3.4, 3.5];
+export const TBC_MIN = 5;
+
+/** @deprecated use TBC_BC */
+export const TBC_RATIO = TBC_BC;
 export const SAP_BELOW_MIN = ["PAMA BMO 2", "BAR BMO 3", "BUMA LMO", "FAD LMO"];
 export const TBC_BLINDSPOT_UP = ["KDC BMO 1", "KDC GMO"];
 export const GR_BLINDSPOT = [
@@ -57,17 +84,42 @@ export const GR_REPEAT = [
   { name: "MTN SMO", note: "Seatbelt 2× di Q2" },
 ];
 
-export const GR_TABLE = [
-  { code: "GR 1", jenis: "Menutup kamera DMS", q1: "1", q2: "3", hot: false },
-  { code: "GR 2", jenis: "Headset", q1: "1", q2: "8", hot: false },
-  { code: "GR 3", jenis: "Seatbelt", q1: "4", q2: "13", hot: true },
-  { code: "GR 4", jenis: "GOTO", q1: "1", q2: "4", hot: false },
-  { code: "GR 5", jenis: "Bodyharness", q1: "–", q2: "1", hot: false },
-  { code: "GR 6", jenis: "Penyangga", q1: "–", q2: "1", hot: false },
-  { code: "GR 7", jenis: "Berdiri di atas crest", q1: "–", q2: "1", hot: false },
-  { code: "GR 8", jenis: "Sandaran", q1: "–", q2: "1", hot: false },
-  { code: "GR 9", jenis: "Pelampung", q1: "–", q2: "1", hot: false },
+export type GrTone = "warn" | "hot" | "mild" | null;
+
+export const GR_TABLE: {
+  code: string;
+  jenis: string;
+  q1: string;
+  q2: string;
+  tone: GrTone;
+}[] = [
+  { code: "GR 1", jenis: "Menutup kamera DMS", q1: "–", q2: "3", tone: "warn" },
+  { code: "GR 2", jenis: "Headset", q1: "4", q2: "–", tone: null },
+  { code: "GR 2", jenis: "HP", q1: "4", q2: "8", tone: "hot" },
+  { code: "GR 2", jenis: "Seatbelt", q1: "4", q2: "13", tone: "hot" },
+  { code: "GR 3", jenis: "LOTO", q1: "2", q2: "3", tone: "mild" },
+  { code: "GR 4", jenis: "Bodyharness", q1: "–", q2: "2", tone: "warn" },
+  { code: "GR 6", jenis: "Penyanggaan", q1: "–", q2: "1", tone: "warn" },
+  { code: "GR 7", jenis: "Berdiri di atas crest", q1: "–", q2: "1", tone: "warn" },
+  { code: "GR 9", jenis: "Undercut", q1: "1", q2: "1", tone: null },
+  { code: "GR 9", jenis: "Pelampung", q1: "–", q2: "1", tone: "warn" },
 ];
+
+export const NARRATIVE = {
+  leadership:
+    "Secara Ratio SAP dan TBC cenderung meningkat dalam beberapa minggu terakhir, tetapi belum memenuhi ratio minimal secara Weekly. Blindspot mengalami penurunan tetapi Blindspot GR mengalami peningkatan dan masih menjadi gap di beberapa mitra kerja utama.",
+  people:
+    "Terdapat peningkatan Golden Rules sebesar 120% dan peningkatan tertinggi pada pelanggaran Seatbelt. Perulangan pelanggaran masih terjadi di spesifik mitra kerja terutama terkait penggunaan Seatbelt",
+  process: [
+    "Implementasi Fatigue Management melalui identifikasi Fit to Work awal shift melalui pengisian Aggregator FTW belum konsisten di Q2.",
+    "Implementasi pelaporan IPK & OKK belum konsisten comply saat pelaksanaan IKK",
+    "Perlunya peningkatan awareness pelaporan Emergency",
+  ],
+  technology: [
+    "Perlunya pemenuhan infrastruktur jaringan untuk meningkatkan kecepatan alert DMS masuk ke Server BeDMS",
+    "Intervensi alert DMS untuk alert Fatigue & Pelanggaran perlu diperkuat untuk mencegah bahaya terlewat.",
+  ],
+} as const;
 
 export const HIGHLIGHTS = [
   { title: "Tidak menggunakan seatbelt", tone: "from-[#2d3e35] to-[#5a4a2a]" },

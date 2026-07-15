@@ -365,6 +365,16 @@ body {
 .sp-tabs::-webkit-scrollbar {
   display: none;
 }
+.sp-panel-scroll {
+  scrollbar-width: thin;
+}
+.sp-panel-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.sp-panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(11, 61, 31, 0.2);
+  border-radius: 999px;
+}
 .sp-tab:focus-visible {
   outline: 2px solid var(--green-mid);
   outline-offset: 2px;

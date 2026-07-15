@@ -54,80 +54,54 @@ export default function LeadingPerformanceSlide({ onBack, onNext }: Props) {
   const active = TABS.find((t) => t.id === activeTab) ?? TABS[0];
 
   return (
-    <div className="sp-slide lp-slide min-h-screen bg-[#f9fafb] text-[color:var(--ink)]">
-      <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-6">
-        <motion.header
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
-          className="grid grid-cols-1 items-center gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-[auto_1fr_auto] md:gap-6"
-        >
-          <div className="flex items-center gap-3">
-            {onBack && (
-              <button
-                type="button"
-                onClick={onBack}
-                className="mr-1 rounded-lg border border-slate-200 px-2.5 py-2 text-[11px] font-semibold text-slate-600 transition hover:border-emerald-400 hover:text-emerald-800"
-              >
-                ←
-              </button>
-            )}
-            <div
-              className="grid h-14 w-14 shrink-0 place-items-center rounded-full shadow-md"
-              style={{ background: "radial-gradient(circle at 30% 30%, var(--green-mid), var(--green-deep))" }}
-            >
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="m9 12 2 2 4-4" />
-              </svg>
-            </div>
-            <div className="leading-tight">
-              <div className="text-[11px] font-bold tracking-[0.12em] text-[color:var(--green-mid)]">
-                DIVISI · SYSTEM DEFENDER
-              </div>
-              <div className="max-w-[220px] text-[11px] text-[color:var(--ink-soft)]">
-                Menjaga sistem, agar operasi tetap maju, aman, dan produktif
+    <div className="sp-slide lp-slide relative flex h-dvh max-h-dvh flex-col overflow-hidden bg-white text-[color:var(--ink)]">
+      <div
+        className="pointer-events-none absolute -right-20 -top-24 h-[280px] w-[280px] rounded-full border-[20px] border-[color:var(--green-deep)]/[0.04]"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -right-4 top-10 h-[180px] w-[180px] rounded-full border border-dashed border-[color:var(--green-mid)]/20"
+        aria-hidden
+      />
+
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-[1600px] flex-col px-3 py-2.5 md:px-5 md:py-3">
+        <header className="shrink-0">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+            <div className="flex min-w-0 items-center gap-2.5">
+              {onBack && (
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="text-[11px] font-semibold text-[color:var(--ink-soft)] transition hover:text-[color:var(--green-deep)]"
+                  aria-label="Kembali"
+                >
+                  ←
+                </button>
+              )}
+              <div className="leading-tight">
+                <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-[color:var(--green-mid)]">
+                  System Defender · HSECM Q2 2026
+                </p>
+                <h1 className="font-heading text-lg font-extrabold tracking-tight text-[color:var(--ink)] sm:text-xl md:text-[1.35rem]">
+                  Leading Performance
+                </h1>
               </div>
             </div>
-          </div>
 
-          <div className="order-3 text-center md:order-2">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--ink-soft)]">
-              HSECM Tingkat I · Q2 2026
-            </div>
-            <h1 className="mt-1 font-heading text-xl font-black leading-tight text-[color:var(--ink)] md:text-2xl lg:text-[28px]">
-              Leading Performance
-            </h1>
-            <p className="mt-1 text-[12px] text-[color:var(--ink-soft)]">{active.label}</p>
-          </div>
-
-          <div className="order-2 flex items-center justify-end gap-3 md:order-3">
-            <span className="rounded-full bg-red-600 px-3 py-1.5 text-[11px] font-bold tracking-wide text-white shadow-md">
-              #SiagaSalingMenjaga
-            </span>
-            <div className="border-l border-slate-200 pl-3">
-              <BerauCoalLogo height={36} />
+            <div className="flex items-center gap-3">
+              <span className="sp-hash-stamp text-[10px] sm:text-[11px]">#SiagaSalingMenjaga</span>
+              <BerauCoalLogo height={26} />
             </div>
           </div>
-        </motion.header>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.08 }}
-          className="mt-4 rounded-xl border border-slate-200 border-l-4 border-l-[color:var(--green-mid)] bg-white p-4 pl-5 shadow-sm"
-        >
-          <p className="text-[13px] italic leading-relaxed text-[color:var(--ink)] md:text-sm">
-            &ldquo;{LEADING_QUOTE}&rdquo;
+          <p className="mt-1.5 line-clamp-2 text-[11px] leading-snug text-[color:var(--ink)] md:text-[12px]">
+            {LEADING_QUOTE}
           </p>
-        </motion.div>
+        </header>
 
-        <nav
-          className="sp-tabs mt-5 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm"
-          aria-label="Leading Performance tabs"
-        >
-          <div className="flex min-w-max gap-1 md:min-w-0 md:grid md:grid-cols-4">
-            {TABS.map((tab) => {
+        <nav className="sp-tabs mt-2 shrink-0 overflow-x-auto" aria-label="Leading Performance tabs">
+          <div className="flex min-w-max gap-1.5 md:min-w-0 md:grid md:grid-cols-4">
+            {TABS.map((tab, i) => {
               const isActive = tab.id === activeTab;
               return (
                 <button
@@ -136,23 +110,32 @@ export default function LeadingPerformanceSlide({ onBack, onNext }: Props) {
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`sp-tab relative rounded-lg px-3 py-2.5 text-left transition ${
+                  className={`sp-tab flex items-center gap-2 border px-2.5 py-1.5 text-left transition-colors ${
                     isActive
-                      ? "bg-[color:var(--green-deep)] text-white shadow-sm"
-                      : "text-[color:var(--green-deep)] hover:bg-emerald-50/60"
+                      ? "border-[color:var(--green-deep)] bg-[color:var(--green-deep)] text-white"
+                      : "border-slate-200 bg-white text-[color:var(--ink-soft)] hover:border-[color:var(--green-mid)] hover:text-[color:var(--ink)]"
                   }`}
                 >
-                  <div className={`text-[12px] font-bold leading-snug md:text-[13px] ${isActive ? "text-white" : ""}`}>
-                    <span className="md:hidden">{tab.short}</span>
-                    <span className="hidden md:inline">{tab.label}</span>
-                  </div>
-                  <div
-                    className={`mt-0.5 text-[10px] leading-snug ${
-                      isActive ? "text-white/75" : "text-[color:var(--ink-soft)]"
+                  <span
+                    className={`font-heading text-[12px] font-extrabold leading-none ${
+                      isActive ? "text-white/50" : "text-[color:var(--green-mid)]/40"
                     }`}
                   >
-                    {tab.desc}
-                  </div>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[11px] font-bold leading-tight md:text-[12px]">
+                      <span className="md:hidden">{tab.short}</span>
+                      <span className="hidden md:inline">{tab.label}</span>
+                    </span>
+                    <span
+                      className={`mt-0.5 hidden text-[9px] leading-none sm:block ${
+                        isActive ? "text-white/70" : "text-slate-400"
+                      }`}
+                    >
+                      {tab.desc}
+                    </span>
+                  </span>
                 </button>
               );
             })}
@@ -160,17 +143,31 @@ export default function LeadingPerformanceSlide({ onBack, onNext }: Props) {
         </nav>
 
         <TacticSidebarLayout
-          className="mt-5"
+          className="mt-2"
+          fill
+          defaultOpen={false}
           openLabel="Taktik System Defender"
           closedLabel={active.short}
+          actions={
+            onNext ? (
+              <button
+                type="button"
+                onClick={onNext}
+                className="border border-[color:var(--green-deep)] bg-[color:var(--green-deep)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white transition hover:bg-[color:var(--green-mid)]"
+              >
+                Lanjut →
+              </button>
+            ) : null
+          }
         >
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 12 }}
+              className="h-full min-h-0"
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.28 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.22 }}
             >
               {activeTab === "leading" && <PanelLeading />}
               {activeTab === "highlight-gr-tbc" && <PanelHighlightGrTbc />}
@@ -179,25 +176,6 @@ export default function LeadingPerformanceSlide({ onBack, onNext }: Props) {
             </motion.div>
           </AnimatePresence>
         </TacticSidebarLayout>
-
-        <footer className="mt-6 flex flex-col items-center gap-3 py-4 text-center text-[11px] text-[color:var(--ink-soft)]">
-          {onNext && (
-            <button
-              type="button"
-              onClick={onNext}
-              className="rounded-full bg-[color:var(--green-deep)] px-5 py-2.5 text-xs font-bold uppercase tracking-wide text-white shadow-md transition hover:bg-[color:var(--green-mid)]"
-            >
-              Lanjut: Pengendalian Risiko Rekayasa →
-            </button>
-          )}
-          <div>
-            <span className="inline-flex items-center gap-2">
-              <BerauCoalLogo height={18} />
-              <span>· HSECM Tingkat I · Q2 2026 ·</span>
-            </span>{" "}
-            <span className="font-semibold text-[color:var(--green-mid)]">#SiagaSalingMenjaga</span>
-          </div>
-        </footer>
       </div>
     </div>
   );

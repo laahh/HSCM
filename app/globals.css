@@ -330,6 +330,34 @@ body {
 .sp-slide {
   --paper-soft: #f5f8f5;
 }
+.sp-hash-stamp {
+  display: inline-block;
+  transform: rotate(-8deg);
+  border: 1.5px solid #dc2626;
+  color: #dc2626;
+  padding: 0.35rem 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  user-select: none;
+  background: #ffffff;
+  box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.25);
+  animation: sp-stampPulse 2.8s ease-in-out infinite;
+}
+@keyframes sp-stampPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sp-hash-stamp {
+    animation: none;
+  }
+}
 .sp-tabs {
   scrollbar-width: none;
   -ms-overflow-style: none;

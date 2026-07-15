@@ -662,7 +662,7 @@ function BradleyPyramidModal({
               </button>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-x-auto overflow-y-visible px-4 py-5 sm:px-7 sm:py-6">
+            <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto px-4 py-5 sm:px-7 sm:py-6">
               <PyramidChart
                 key={animKey}
                 size="hero"
@@ -670,6 +670,13 @@ function BradleyPyramidModal({
                 reduceMotion={reduceMotion}
                 fallIn
               />
+              <p className="mx-auto mt-5 max-w-4xl border-t border-slate-100 pt-4 text-center text-[12px] leading-relaxed text-[color:var(--ink)] sm:text-[13px]">
+                Performance Q2 2026 masih mencatatkan terdapatnya kejadian berakibat ke pekerja yaitu{" "}
+                <strong className="font-semibold text-red-600">2 Medical Treatment Injury</strong> dan{" "}
+                <strong className="font-semibold text-red-600">Accident Non Injury meningkat 14%</strong>.
+                Jumlah HIPO Incident secara frekuensi menurun drastis dibandingkan Q1. Pelaporan Hazard dan
+                TBC meningkat tetapi Golden Rules meningkat drastic dibandingkan Q1.
+              </p>
             </div>
 
             <div className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-100 px-5 py-3 sm:px-7">

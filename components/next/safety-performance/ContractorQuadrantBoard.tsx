@@ -22,28 +22,28 @@ const Q_META: Record<
     label: "Perlu Perhatian",
     tone: "#b91c1c",
     fill: "#dc2626",
-    soft: "rgba(220,38,38,0.08)",
+    soft: "rgba(252, 165, 165, 0.35)",
     border: "rgba(220,38,38,0.28)",
   },
   K2: {
     label: "Watch",
     tone: "#c2410c",
     fill: "#ea580c",
-    soft: "rgba(234,88,12,0.08)",
+    soft: "rgba(253, 186, 116, 0.32)",
     border: "rgba(234,88,12,0.28)",
   },
   K3: {
     label: "Cukup",
     tone: "#a16207",
     fill: "#ca8a04",
-    soft: "rgba(202,138,4,0.1)",
+    soft: "rgba(253, 224, 71, 0.28)",
     border: "rgba(202,138,4,0.3)",
   },
   K4: {
     label: "Baik",
     tone: "#15803d",
     fill: "#16a34a",
-    soft: "rgba(22,163,74,0.1)",
+    soft: "rgba(134, 239, 172, 0.32)",
     border: "rgba(22,163,74,0.3)",
   },
 };
@@ -54,16 +54,22 @@ type ViewMode = "q1" | "morph" | "q2";
 type MoveKind = "up" | "down" | "flat";
 
 /** Auto timeline (ms) — loops while panel is in view */
-const HOLD_Q1 = 1400;
-const MORPH_MS = 1600;
-const HOLD_Q2 = 2800;
-const LOOP_GAP = 700;
+const HOLD_Q1 = 1200;
+const MORPH_MS = 1800;
+const HOLD_Q2 = 4200;
+const LOOP_GAP = 600;
 const CYCLE_MS = HOLD_Q1 + MORPH_MS + HOLD_Q2 + LOOP_GAP;
 
 function shortName(name: string) {
   const parts = name.split(" ");
   if (parts.length === 1) return parts[0].slice(0, 3);
   return (parts[0].slice(0, 2) + parts[1].slice(0, 1)).toUpperCase();
+}
+
+/** Site tag under logo — e.g. PAMA BMO → BMO */
+function siteTag(name: string) {
+  const parts = name.trim().split(/\s+/);
+  return parts[parts.length - 1];
 }
 
 function moveKind(d: ScatterPoint): MoveKind {
@@ -110,10 +116,10 @@ export function ContractorQuadrantBoard({
   const hero = size === "hero";
   const reduceMotion = useReducedMotion();
   const [active, setActive] = useState<string | null>(null);
-  const [mode, setMode] = useState<ViewMode>("q1");
+  const [mode, setMode] = useState<ViewMode>("q2");
   const [auto, setAuto] = useState(true);
   const [cycle, setCycle] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(1);
   const [filterMove, setFilterMove] = useState<MoveKind | "all">("all");
   const timers = useRef<number[]>([]);
   const raf = useRef<number | null>(null);
@@ -288,7 +294,11 @@ export function ContractorQuadrantBoard({
       <div className="mb-2.5">
         <div className="mb-1 flex items-center justify-between text-[9px] font-semibold uppercase tracking-wide text-slate-400">
           <span>
-            {mode === "q1" ? "Posisi Q1" : mode === "morph" ? "Bergerak ke Q2…" : "Posisi Q2"}
+            {mode === "q1"
+              ? "Posisi Q1"
+              : mode === "morph"
+                ? "Bergerak dari asal Q1…"
+                : "Asal Q1 → Posisi Q2"}
           </span>
           <span className="tabular-nums">{auto ? "Loop otomatis" : "Manual"}</span>
         </div>
@@ -315,7 +325,14 @@ export function ContractorQuadrantBoard({
       </div>
 
       {/* Movement summary */}
-      <div className="mb-3 flex flex-wrap gap-1.5">
+      <div className="mb-3 flex flex-wrap items-center gap-1.5">
+        <span className="mr-1 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[9px] font-bold text-slate-600">
+          <span className="inline-block h-3 w-3 rounded-full border border-slate-400 bg-slate-200 grayscale" />
+          Asal Q1
+          <span className="text-slate-300">→</span>
+          <span className="inline-block h-3 w-3 rounded-full border-2 border-emerald-600 bg-emerald-100" />
+          Kini Q2
+        </span>
         {(
           [
             { id: "all" as const, label: "Semua", n: enriched.length, color: "#334155" },
@@ -520,48 +537,41 @@ export function ContractorQuadrantBoard({
             transition={{ duration: 0.7, delay: 0.08, ease }}
           />
 
-          {/* Quadrant labels */}
+          {/* Quadrant watermarks */}
           {(
             [
-              { q: "K1" as const, x: x0 + 14, y: y0 + 16 },
-              { q: "K2" as const, x: midX + 14, y: y0 + 16 },
-              { q: "K3" as const, x: x0 + 14, y: midY + 16 },
-              { q: "K4" as const, x: midX + 14, y: midY + 16 },
+              { q: 1, x: x0 + 18, y: y0 + 28, anchor: "start" as const },
+              { q: 2, x: x1 - 18, y: y0 + 28, anchor: "end" as const },
+              { q: 3, x: x0 + 18, y: y1 - 14, anchor: "start" as const },
+              { q: 4, x: x1 - 18, y: y1 - 14, anchor: "end" as const },
             ]
           ).map((t, i) => (
-            <motion.g
-              key={t.q}
+            <motion.text
+              key={`wm-${t.q}`}
+              x={t.x}
+              y={t.y}
+              textAnchor={t.anchor}
+              fontSize="22"
+              fontWeight="800"
+              fill="#0f172a"
+              opacity={0.12}
               initial={{ opacity: 0 }}
-              animate={{ opacity: inView ? 1 : 0 }}
-              transition={{ delay: 0.25 + i * 0.06 }}
+              animate={{ opacity: inView ? 0.12 : 0 }}
+              transition={{ delay: 0.2 + i * 0.05 }}
+              style={{ pointerEvents: "none" }}
             >
-              <rect
-                x={t.x - 4}
-                y={t.y - 11}
-                width={92}
-                height={18}
-                rx={9}
-                fill="#fff"
-                stroke={Q_META[t.q].border}
-              />
-              <circle cx={t.x + 5} cy={t.y - 2} r={3} fill={Q_META[t.q].fill} />
-              <text x={t.x + 12} y={t.y + 1} fontSize="8.5" fontWeight="800" fill={Q_META[t.q].tone}>
-                {t.q}
-              </text>
-              <text x={t.x + 30} y={t.y + 1} fontSize="7.5" fontWeight="600" fill="#64748b">
-                {Q_META[t.q].label}
-              </text>
-            </motion.g>
+              Kuadran {t.q}
+            </motion.text>
           ))}
 
-          {/* Trajectories Q1 → Q2 */}
+          {/* Trajectories Q1 → Q2 (asal → kini) */}
           {visible.map((d, i) => {
             const xA = sx(d.leadQ1);
             const yA = sy(d.sevQ1);
             const xB = sx(d.lead);
             const yB = sy(d.sev);
             const dist = Math.hypot(xB - xA, yB - yA);
-            if (dist < 4) return null;
+            if (dist < 3) return null;
 
             const color =
               d.move === "up" ? "#16a34a" : d.move === "down" ? "#dc2626" : "#94a3b8";
@@ -573,8 +583,9 @@ export function ContractorQuadrantBoard({
                   : `url(#${uid}-arr-flat)`;
             const dim = Boolean(active && active !== d.name);
             const focus = !active || active === d.name;
-            const mx = (xA + xB) / 2;
-            const my = (yA + yB) / 2 - Math.min(22, dist * 0.18);
+            // Slight bow so arrows don't cover logos, still read as origin→now
+            const mx = (xA + xB) / 2 + (yA - yB) * 0.08;
+            const my = (yA + yB) / 2 - (xB - xA) * 0.06;
 
             return (
               <g key={`trail-${d.name}`}>
@@ -582,18 +593,18 @@ export function ContractorQuadrantBoard({
                   d={`M ${xA} ${yA} Q ${mx} ${my} ${xB} ${yB}`}
                   fill="none"
                   stroke={color}
-                  strokeWidth={focus ? 2.25 : 1.35}
+                  strokeWidth={focus ? 2.6 : 1.5}
                   strokeLinecap="round"
                   markerEnd={marker}
-                  strokeDasharray={d.move === "flat" ? "4 4" : undefined}
+                  strokeDasharray={d.move === "flat" ? "5 4" : undefined}
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{
                     pathLength: inView && showTrails ? 1 : 0,
-                    opacity: inView && showTrails ? (dim ? 0.1 : 0.85) : 0,
+                    opacity: inView && showTrails ? (dim ? 0.12 : 0.9) : 0,
                   }}
                   transition={{
                     pathLength: {
-                      duration: reduceMotion ? 0.01 : mode === "morph" ? MORPH_MS / 1000 : 0.85,
+                      duration: reduceMotion ? 0.01 : mode === "morph" ? MORPH_MS / 1000 : 0.7,
                       delay:
                         reduceMotion || mode !== "morph"
                           ? mode === "q2"
@@ -605,54 +616,11 @@ export function ContractorQuadrantBoard({
                     opacity: { duration: 0.25 },
                   }}
                 />
-                {/* Mid delta chip for movers */}
-                {d.move !== "flat" && focus && showTrails && !active && (
-                  <motion.text
-                    x={mx}
-                    y={my - 4}
-                    fontSize="7.5"
-                    fontWeight="800"
-                    fill={color}
-                    textAnchor="middle"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: inView ? 0.9 : 0 }}
-                    transition={{ delay: 0.7 + i * 0.05 }}
-                  >
-                    {d.q1}→{d.q}
-                  </motion.text>
-                )}
               </g>
             );
           })}
 
-          {/* Q1 ghost rings (always when comparing / at Q2) */}
-          {visible.map((d, i) => {
-            if (mode === "q1") return null;
-            const x = sx(d.leadQ1);
-            const y = sy(d.sevQ1);
-            const dim = Boolean(active && active !== d.name);
-            return (
-              <motion.circle
-                key={`q1-${d.name}`}
-                cx={x}
-                cy={y}
-                r={9}
-                fill="none"
-                stroke={Q_META[d.q1].fill}
-                strokeWidth="1.6"
-                strokeDasharray="3.5 2.5"
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{
-                  opacity: inView ? (dim ? 0.08 : 0.45) : 0,
-                  scale: 1,
-                }}
-                transition={{ delay: reduceMotion ? 0 : 0.15 + i * 0.04 }}
-                style={{ transformOrigin: `${x}px ${y}px` }}
-              />
-            );
-          })}
-
-          {/* Live points (morph between Q1 and Q2) — hit targets + ring; logos via HTML overlay */}
+          {/* Live hit targets (logos rendered as HTML overlay) */}
           {visible.map((d, i) => {
             const at = pointAt(d);
             const x = sx(at.lead);
@@ -673,7 +641,7 @@ export function ContractorQuadrantBoard({
                 key={`pt-${d.name}`}
                 tabIndex={0}
                 role="button"
-                aria-label={`${d.name}, ${d.q1} ke ${d.q}, leading ${d.lead}%`}
+                aria-label={`${d.name}, dari ${d.q1} ke ${d.q}, leading ${d.lead}%`}
                 style={{ cursor: "pointer", outline: "none" }}
                 onMouseEnter={() => setActive(d.name)}
                 onMouseLeave={() => setActive(null)}
@@ -740,27 +708,62 @@ export function ContractorQuadrantBoard({
                     {shortName(d.name)}
                   </motion.text>
                 )}
-
-                <motion.text
-                  x={x}
-                  y={y - (isOn ? 30 : 26)}
-                  fontSize="8.5"
-                  fontWeight="700"
-                  fill="#0f172a"
-                  textAnchor="middle"
-                  style={{ pointerEvents: "none" }}
-                  animate={{ x, y: y - (isOn ? 30 : 26) }}
-                  transition={pointEase}
-                >
-                  {d.name}
-                </motion.text>
               </motion.g>
             );
           })}
         </svg>
 
-        {/* Company logos on points (HTML img — always visible, not hover-only) */}
+        {/* Logos: abu-abu = asal Q1, warna = posisi kini */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {visible.map((d) => {
+            const logo = contractorLogo(d.name);
+            if (!logo || !showTrails) return null;
+            const dist = Math.hypot(sx(d.lead) - sx(d.leadQ1), sy(d.sev) - sy(d.sevQ1));
+            if (dist < 3) return null;
+
+            const xPct = (sx(d.leadQ1) / 760) * 100;
+            const yPct = (sy(d.sevQ1) / 400) * 100;
+            const dim = Boolean(active && active !== d.name);
+            const size = hero ? 34 : 28;
+
+            return (
+              <motion.div
+                key={`origin-${d.name}`}
+                className="absolute flex flex-col items-center"
+                style={{
+                  left: `${xPct}%`,
+                  top: `${yPct}%`,
+                  width: size,
+                  marginLeft: -size / 2,
+                  marginTop: -size / 2,
+                  zIndex: 0,
+                }}
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{
+                  opacity: inView ? (dim ? 0.12 : 0.85) : 0,
+                  scale: 1,
+                }}
+                transition={{ duration: 0.35 }}
+              >
+                <div
+                  className="grid place-items-center overflow-hidden rounded-full border-2 border-slate-400 bg-white shadow-sm"
+                  style={{ width: size, height: size }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={logo}
+                    alt=""
+                    className="h-full w-full object-contain p-[2px] grayscale contrast-125"
+                    draggable={false}
+                  />
+                </div>
+                <span className="mt-0.5 rounded bg-white/90 px-1 text-[8px] font-bold leading-none text-slate-500">
+                  Q1
+                </span>
+              </motion.div>
+            );
+          })}
+
           {visible.map((d, i) => {
             const logo = contractorLogo(d.name);
             if (!logo) return null;
@@ -779,35 +782,37 @@ export function ContractorQuadrantBoard({
             return (
               <motion.div
                 key={`logo-${d.name}`}
-                className="absolute grid place-items-center overflow-hidden rounded-full border-[2.5px] bg-white shadow-sm"
-                style={{
-                  borderColor: fill,
-                  width: size,
-                  height: size,
-                  marginLeft: -size / 2,
-                  marginTop: -size / 2,
-                  zIndex: isOn ? 2 : 1,
-                }}
+                className="absolute flex flex-col items-center"
+                style={{ zIndex: isOn ? 3 : 1 }}
                 initial={false}
                 animate={{
                   left: `${xPct}%`,
                   top: `${yPct}%`,
-                  width: size,
-                  height: size,
                   marginLeft: -size / 2,
                   marginTop: -size / 2,
-                  borderColor: fill,
                   opacity: inView ? (dim ? 0.22 : 1) : 0,
                 }}
                 transition={pointEase}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={logo}
-                  alt=""
-                  className="h-full w-full object-contain p-[3px]"
-                  draggable={false}
-                />
+                <div
+                  className="grid place-items-center overflow-hidden rounded-full border-[2.5px] bg-white shadow-sm"
+                  style={{
+                    borderColor: fill,
+                    width: size,
+                    height: size,
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={logo}
+                    alt=""
+                    className="h-full w-full object-contain p-[3px]"
+                    draggable={false}
+                  />
+                </div>
+                <span className="mt-0.5 rounded bg-white/95 px-1 text-[9px] font-extrabold leading-none text-slate-800 shadow-sm">
+                  {siteTag(d.name)}
+                </span>
               </motion.div>
             );
           })}
@@ -903,7 +908,7 @@ export function ContractorQuadrantBoard({
                 exit={{ opacity: 0 }}
                 className="rounded-2xl border border-dashed border-slate-200 bg-white/85 px-3.5 py-2.5 text-center text-[11px] text-slate-500 backdrop-blur-sm"
               >
-                Panah menunjukkan perjalanan tiap kontraktor dari Q1 ke Q2 — putar otomatis, atau hover untuk detail Δ
+                Panah menunjuk dari asal Q1 (logo abu-abu) ke posisi Q2 (logo warna) — hover untuk detail Δ
               </motion.div>
             )}
           </AnimatePresence>

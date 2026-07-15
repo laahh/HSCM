@@ -1111,6 +1111,13 @@ function CompTrendModal({ open, onClose }: { open: boolean; onClose: () => void 
                   <TrendColumn size="hero" loop forcePlay />
                 </div>
               </div>
+              <p className="mt-4 border-t border-slate-100 pt-3 text-[12px] leading-relaxed text-[color:var(--ink)] sm:text-[13px]">
+                Peningkatan{" "}
+                <strong className="font-semibold text-red-600">11% insiden</strong> pada Mitra Kerja
+                Mine Contractor baik pada Aktivitas Core &amp; Support. Terdapat perulangan kontak
+                kejadian pada Aktivitas Support seperti di Area Pit Service dan perulangan kejadian
+                berakibat Injury pada aktivitas Maintenance.
+              </p>
             </div>
 
             <div className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-100 px-5 py-3 sm:px-7">
@@ -1200,6 +1207,14 @@ export default function PanelC() {
           <PhotosColumn onExpand={() => setPhotoOpen(true)} loop={!photoOpen} />
         </div>
       </div>
+
+      <p className="mt-4 border-t border-slate-100 pt-3 text-[12px] leading-relaxed text-[color:var(--ink)] md:text-[13px]">
+        Peningkatan{" "}
+        <strong className="font-semibold text-red-600">11% insiden</strong> pada Mitra Kerja Mine
+        Contractor baik pada Aktivitas Core &amp; Support. Terdapat perulangan kontak kejadian pada
+        Aktivitas Support seperti di Area Pit Service dan perulangan kejadian berakibat Injury pada
+        aktivitas Maintenance.
+      </p>
 
       <IncidentProfileModal open={photoOpen} onClose={() => setPhotoOpen(false)} />
       <CompTrendModal open={chartOpen} onClose={() => setChartOpen(false)} />

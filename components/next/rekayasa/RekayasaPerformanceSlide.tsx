@@ -2,8 +2,7 @@
 
 import { motion } from "framer-motion";
 import BerauCoalLogo from "../../brand/BerauCoalLogo";
-import { PILLARS, TACTICS } from "../system-defender/tactical/data";
-import { TACTIC_CARDS } from "../safety-performance/data";
+import TacticSidebarLayout from "../TacticSidebarLayout";
 
 type Props = {
   onBack?: () => void;
@@ -12,13 +11,6 @@ type Props = {
 
 const QUOTE =
   "Fokus engineering / pengendalian risiko rekayasa diarahkan untuk menurunkan severity dan memperkuat kontrol pada aktivitas berisiko tinggi seperti Dozing, Dumping, dan Dewatering — sehingga residual risk semakin terkendali.";
-
-const PILLAR_ICON: Record<string, string> = {
-  leadership: "L",
-  people: "P",
-  process: "R",
-  technology: "T",
-};
 
 const KPIS = [
   {
@@ -137,42 +129,11 @@ export default function RekayasaPerformanceSlide({ onBack, onNext }: Props) {
           </p>
         </motion.div>
 
-        {/* Layout sama Safety/Leading: sidebar tactic | konten — tanpa tab */}
-        <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[260px_1fr]">
-          <motion.aside
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.55, delay: 0.12 }}
-            className="space-y-3"
-          >
-            <div className="space-y-2.5">
-              {TACTIC_CARDS.map((t, i) => (
-                <div key={t.n} className="sp-tac-card flex items-start gap-3 p-3.5" title={TACTICS[i]?.centerMessage}>
-                  <div className="text-2xl font-black leading-none opacity-25">{t.n}</div>
-                  <div>
-                    <div className="text-[13px] font-bold tracking-wide">{t.title}</div>
-                    <div className="mt-1 text-[11px] leading-snug opacity-85">{t.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap gap-2 pt-1">
-              {PILLARS.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[color:var(--green-mid)]"
-                >
-                  <span className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--green-mid)]/10 text-[9px] font-bold">
-                    {PILLAR_ICON[p.id]}
-                  </span>
-                  {p.title}
-                </div>
-              ))}
-            </div>
-          </motion.aside>
-
-          <main className="min-w-0">
+        <TacticSidebarLayout
+          className="mt-5"
+          openLabel="Taktik System Defender"
+          closedLabel="Rekayasa penuh"
+        >
             {/* Board: KPI | Hierarchy | Tech */}
             <div className="grid grid-cols-1 gap-3 xl:grid-cols-[148px_minmax(0,1.1fr)_minmax(0,1fr)] xl:items-start">
               {/* KPI strip */}
@@ -261,8 +222,7 @@ export default function RekayasaPerformanceSlide({ onBack, onNext }: Props) {
                 </div>
               </motion.div>
             </div>
-          </main>
-        </div>
+        </TacticSidebarLayout>
 
         <footer className="mt-6 flex flex-col items-center gap-3 py-4 text-center text-[11px] text-[color:var(--ink-soft)]">
           {onNext && (

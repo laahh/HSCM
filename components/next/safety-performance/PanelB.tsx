@@ -6,6 +6,20 @@ import { createPortal } from "react-dom";
 import { ContractorQuadrantBoard } from "./ContractorQuadrantBoard";
 import ContractorRaporTable from "./ContractorRaporTable";
 
+const RAPOR_NARRATIVE = (
+  <>
+    Rapor Mitra Kerja yang menjadi catatan utama adalah peningkatan Lagging di{" "}
+    <strong className="font-semibold text-red-600">PAMA BMO</strong> dan{" "}
+    <strong className="font-semibold text-red-600">PAMA GMO</strong> secara jumlah dan severity yang
+    masuk pada Kuadran 1 serta masih tidak terdapat perbaikan dari Q1. Secara leading mitra kerja{" "}
+    <strong className="font-semibold text-red-600">BAR</strong> mengalami penurunan pada aspek
+    Leadership. Mitra kerja pada Kuadran 4 yang mengalami peningkatan Lagging di{" "}
+    <strong className="font-semibold text-[color:var(--ink)]">FAD</strong> dan{" "}
+    <strong className="font-semibold text-[color:var(--ink)]">KDC</strong> perlu dilakukan
+    pendalaman karena skor leading yang cukup tinggi tetapi terdapat gap pada Incident.
+  </>
+);
+
 export default function PanelB() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -58,6 +72,10 @@ export default function PanelB() {
       >
         <ContractorRaporTable variant="compact" />
       </ContractorQuadrantBoard>
+
+      <p className="mt-4 border-t border-slate-100 pt-3 text-[12px] leading-relaxed text-[color:var(--ink)] md:text-[13px]">
+        {RAPOR_NARRATIVE}
+      </p>
 
       {mounted &&
         createPortal(
@@ -122,6 +140,9 @@ export default function PanelB() {
                   <div className="min-h-0 flex-1 space-y-4 overflow-auto px-4 py-4 sm:px-7 sm:py-5">
                     <ContractorQuadrantBoard key={`board-${animKey}`} size="hero" forcePlay />
                     <ContractorRaporTable key={`table-${animKey}`} variant="hero" animate />
+                    <p className="border-t border-slate-100 pt-3 text-[12px] leading-relaxed text-[color:var(--ink)] sm:text-[13px]">
+                      {RAPOR_NARRATIVE}
+                    </p>
                   </div>
 
                   <div className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-100 px-5 py-3 sm:px-7">

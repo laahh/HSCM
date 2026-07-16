@@ -97,7 +97,7 @@ function CategoryBrace({
         strokeLinejoin="round"
         initial={{ opacity: 0 }}
         animate={play ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ delay: instant ? 0 : delay + 0.35, duration: 0.25 }}
+        transition={{ delay: instant ? 0 : delay + 0.35, duration: instant ? 0 : 0.25 }}
       />
       <motion.path
         d={`M${x - 3.5} ${y + h - 6} L${x} ${y + h - 2} L${x + 3.5} ${y + h - 6}`}
@@ -107,7 +107,7 @@ function CategoryBrace({
         strokeLinejoin="round"
         initial={{ opacity: 0 }}
         animate={play ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ delay: instant ? 0 : delay + 0.35, duration: 0.25 }}
+        transition={{ delay: instant ? 0 : delay + 0.35, duration: instant ? 0 : 0.25 }}
       />
       <motion.text
         x={x + 10}
@@ -120,7 +120,7 @@ function CategoryBrace({
         transform={`rotate(90 ${x + 10} ${mid})`}
         initial={{ opacity: 0 }}
         animate={play ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ delay: instant ? 0 : delay + 0.4, duration: 0.3 }}
+        transition={{ delay: instant ? 0 : delay + 0.4, duration: instant ? 0 : 0.3 }}
       >
         {label}
       </motion.text>
@@ -189,9 +189,12 @@ function PyramidChart({
         <motion.div
           className={`relative shrink-0 ${large ? "w-7 sm:w-8" : "w-5 sm:w-6"}`}
           style={{ height: totalH + 22 }}
-          initial={{ opacity: 0 }}
+          initial={reduceMotion ? false : { opacity: 0 }}
           animate={reveal ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ delay: reduceMotion || !fallIn ? 0.15 : 0.05, duration: 0.45 }}
+          transition={{
+            delay: reduceMotion ? 0 : !fallIn ? 0.15 : 0.05,
+            duration: reduceMotion ? 0 : 0.45,
+          }}
         >
           <span
             className={`absolute left-1/2 top-6 bottom-4 -translate-x-1/2 rotate-180 text-center font-bold leading-tight text-red-600 [writing-mode:vertical-rl] ${
@@ -213,9 +216,12 @@ function PyramidChart({
             <div />
             <motion.div
               className="grid grid-cols-3 pl-1 text-left"
-              initial={{ opacity: 0, y: -4 }}
+              initial={reduceMotion ? false : { opacity: 0, y: -4 }}
               animate={reveal ? { opacity: 1, y: 0 } : { opacity: 0, y: -4 }}
-              transition={{ delay: fallIn ? 0.05 : 0.1, duration: 0.35 }}
+              transition={{
+                delay: reduceMotion ? 0 : fallIn ? 0.05 : 0.1,
+                duration: reduceMotion ? 0 : 0.35,
+              }}
             >
               <span>2025</span>
               <span>Q1 2026</span>
@@ -496,7 +502,7 @@ function PyramidChart({
                       : fallIn
                         ? 0.08 + i * 0.045
                         : 0.35 + (n - 1 - i) * 0.05,
-                    duration: 0.4,
+                    duration: reduceMotion ? 0 : 0.4,
                     ease: easeOut,
                   }}
                 >
@@ -543,7 +549,7 @@ function PyramidChart({
                           delay: (fallIn ? 0.18 : 0.75) + i * 0.08,
                           ease: easeOut,
                         }
-                      : { duration: 0.25 }
+                      : { duration: 0 }
                   }
                 />
               );
@@ -607,10 +613,10 @@ function BradleyPyramidModal({
             aria-modal="true"
             aria-labelledby="bradley-modal-title"
             className="relative z-[1] flex max-h-[min(96vh,920px)] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-2xl"
-            initial={{ opacity: 0, y: 28, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 320, damping: 28 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
           >
             <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-7">
               <div>

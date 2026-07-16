@@ -161,4 +161,4 @@ export const RULE_TRIGGER_DEMO: RuleTriggerItem[] = [
   },
 ];
 
-export const DEMO_DURATION_MS = 30_000;
+export const DEMO_DURATION_MS = 5_000;

@@ -1,6 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import BerauCoalLogo from "../../brand/BerauCoalLogo";
 import TacticSidebarLayout from "../TacticSidebarLayout";
 
@@ -8,6 +10,8 @@ type Props = {
   onBack?: () => void;
   onNext?: () => void;
 };
+
+const DOZER_VIDEO_SRC = "/dozer.mp4";
 
 const QUOTE =
   "Fokus engineering / pengendalian risiko rekayasa diarahkan untuk menurunkan severity dan memperkuat kontrol pada aktivitas berisiko tinggi seperti Dozing, Dumping, dan Dewatering — sehingga residual risk semakin terkendali.";
@@ -55,6 +59,77 @@ function FitImg({ src, alt }: { src: string; alt: string }) {
 }
 
 export default function RekayasaPerformanceSlide({ onBack, onNext }: Props) {
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [needsUnmute, setNeedsUnmute] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!videoOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setVideoOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [videoOpen]);
+
+  useEffect(() => {
+    if (!videoOpen) {
+      setNeedsUnmute(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const tryPlay = () => {
+      const v = videoRef.current;
+      if (!v || cancelled) return;
+      v.currentTime = 0;
+      v.muted = false;
+      const playPromise = v.play();
+      if (playPromise && typeof playPromise.then === "function") {
+        playPromise.catch(() => {
+          if (cancelled) return;
+          v.muted = true;
+          setNeedsUnmute(true);
+          v.play().catch(() => {});
+        });
+      }
+    };
+
+    // Wait one frame so the portaled <video> is mounted after AnimatePresence
+    const raf = requestAnimationFrame(() => {
+      tryPlay();
+      // Retry once if ref was not ready yet
+      if (!videoRef.current) {
+        window.setTimeout(tryPlay, 80);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+    };
+  }, [videoOpen]);
+
+  const closeVideo = () => {
+    const v = videoRef.current;
+    if (v) {
+      v.pause();
+      v.currentTime = 0;
+    }
+    setVideoOpen(false);
+  };
+
   return (
     <div className="sp-slide relative flex h-full max-h-full flex-col overflow-hidden bg-white text-[color:var(--ink)]">
       <div className="relative z-10 mx-auto flex h-full w-full max-w-[1600px] min-h-0 flex-col px-3 py-1.5 md:px-4">
@@ -151,18 +226,28 @@ export default function RekayasaPerformanceSlide({ onBack, onNext }: Props) {
               ))}
             </motion.div>
 
-            {/* MIDDLE — Hierarchy */}
-            <motion.section
+            {/* MIDDLE — Hierarchy → plays dozer video */}
+            <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.08 }}
-              className="flex min-h-0 min-w-0 flex-col overflow-hidden border border-slate-200 bg-white"
+              className="flex min-h-0 min-w-0 flex-col overflow-hidden border border-slate-200 bg-white transition hover:border-[color:var(--green-mid)]"
             >
-              <PanelTitle>5 TINGKAT KONTROL REKAYASA (HIERARKI)</PanelTitle>
-              <div className="min-h-0 flex-1 bg-white p-1 sm:p-1.5">
-                <FitImg src="/rekayasa-hierarchy.png" alt="5 Tingkat Kontrol Rekayasa" />
-              </div>
-            </motion.section>
+              <button
+                type="button"
+                onClick={() => setVideoOpen(true)}
+                className="group flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--green-deep)]"
+                aria-label="Putar video 5 Tingkat Kontrol Rekayasa"
+              >
+                <PanelTitle>5 TINGKAT KONTROL REKAYASA (HIERARKI)</PanelTitle>
+                <div className="relative min-h-0 flex-1 bg-white p-1 sm:p-1.5">
+                  <FitImg src="/rekayasa-hierarchy.png" alt="5 Tingkat Kontrol Rekayasa" />
+                  <span className="pointer-events-none absolute bottom-2 right-2 border border-[color:var(--green-deep)]/50 bg-white/95 px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-[color:var(--green-deep)] shadow-sm">
+                    ▶ Klik untuk putar video
+                  </span>
+                </div>
+              </button>
+            </motion.div>
 
             {/* RIGHT — Tech stack + Need Support */}
             <motion.div
@@ -216,6 +301,104 @@ export default function RekayasaPerformanceSlide({ onBack, onNext }: Props) {
           </div>
         </TacticSidebarLayout>
       </div>
+
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {videoOpen && (
+              <motion.div
+                className="fixed inset-0 flex items-center justify-center p-2 sm:p-4"
+                style={{ zIndex: 200 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22 }}
+              >
+                <motion.button
+                  type="button"
+                  aria-label="Tutup video"
+                  className="absolute inset-0 bg-slate-950/75 backdrop-blur-[2px]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={closeVideo}
+                />
+
+                <motion.div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="dozer-video-title"
+                  className="relative flex w-full max-w-[1400px] flex-col overflow-hidden border border-slate-200/90 bg-black shadow-2xl"
+                  style={{ zIndex: 1, height: "min(92vh, 980px)" }}
+                  initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 12, scale: 0.99 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 28 }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <header className="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#101720] px-3 py-2.5 sm:px-4">
+                    <div className="min-w-0">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[color:var(--green-mid)]">
+                        5 Tingkat Kontrol Rekayasa
+                      </p>
+                      <h2
+                        id="dozer-video-title"
+                        className="truncate font-heading text-sm font-extrabold text-white sm:text-base"
+                      >
+                        Remote Dozer — Video Operasi
+                      </h2>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={closeVideo}
+                      className="grid h-9 w-9 shrink-0 place-items-center border border-white/20 bg-white/5 text-white transition hover:bg-white/15"
+                      aria-label="Tutup"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+                        <path
+                          d="M4 4l8 8M12 4L4 12"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </header>
+
+                  <div className="relative min-h-0 flex-1 bg-black">
+                    <video
+                      ref={videoRef}
+                      src={DOZER_VIDEO_SRC}
+                      className="absolute inset-0 h-full w-full object-contain"
+                      playsInline
+                      controls
+                      autoPlay
+                      preload="auto"
+                    />
+
+                    {needsUnmute && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const v = videoRef.current;
+                          if (v) {
+                            v.muted = false;
+                            v.play().catch(() => {});
+                          }
+                          setNeedsUnmute(false);
+                        }}
+                        className="absolute bottom-6 left-1/2 -translate-x-1/2 border border-white/25 bg-white/95 px-4 py-2 font-heading text-xs font-bold uppercase tracking-wide text-[color:var(--ink)] shadow-xl transition hover:bg-white"
+                      >
+                        Aktifkan Suara
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 }

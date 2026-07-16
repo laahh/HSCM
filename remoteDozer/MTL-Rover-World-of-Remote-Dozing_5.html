@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTL ROVER — World of Remote Dozing</title>
+<!-- Rev 4: proportional 3D assets, terrain-aligned staging, duplicate map removed -->
+<meta name="description" content="Pengalaman interaktif operasi Remote Dozing PT Berau Coal — didukung MTL ROVER, unit caravan tele-remote. Jelajahi alur 6 tahap, dari ruang kontrol hingga dozer beroperasi di titik disposal.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<style>
+:root{
+  --void:#0a0f15; --pit:#101720; --panel:#131b25; --card:#182230;
+  --line:rgba(150,180,210,.10); --line2:rgba(150,180,210,.18);
+  --haze:#e9eef3; --hazedim:#c3ccd6;
+  --mtl:#2680e8; --mtl-d:#1a63c0;
+  --signal:#f5a623; --go:#6ba043; --go-d:#4d7c30; --danger:#ff4a3d;
+  --txt:#eaf1f8; --txt2:#9aabbd; --txt3:#5f7289;
+  --disp:'Archivo',sans-serif; --sans:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--txt);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--signal);color:#101}
+a{color:inherit;text-decoration:none} button{font-family:inherit;cursor:pointer}
+img{max-width:100%}
+
+/* ============ TOP BAR ============ */
+.topbar{position:fixed;top:0;left:0;right:0;height:58px;z-index:120;
+  display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,3vw,34px);
+  background:linear-gradient(180deg,rgba(8,12,17,.92),rgba(8,12,17,.55) 70%,transparent);backdrop-filter:blur(8px)}
+.brand{display:flex;align-items:center;gap:12px}
+.diamond{width:34px;height:34px;background:var(--mtl);flex-shrink:0;
+  clip-path:polygon(15% 0,85% 0,100% 15%,100% 85%,85% 100%,15% 100%,0 85%,0 15%);
+  display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:11px;color:#fff}
+.brand-txt{line-height:1.05}
+.brand-main{font-family:var(--disp);font-weight:800;font-size:19px;letter-spacing:.06em}
+.brand-main em{color:var(--mtl);font-style:normal}
+.brand-sub{font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;color:var(--txt3);text-transform:uppercase;margin-top:2px}
+.top-right{display:flex;align-items:center;gap:16px}
+.status{display:flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid rgba(107,160,67,.3);background:rgba(107,160,67,.07);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--go);text-transform:uppercase}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--go);box-shadow:0 0 8px var(--go);animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.top-unit{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--txt3)}
+@media(max-width:720px){.top-unit{display:none}}
+
+/* ============ STAGE ============ */
+.stage{position:relative;height:100vh;min-height:640px;width:100%;overflow:hidden;background:var(--void)}
+.scene-wrap{position:absolute;inset:0}
+.mv-layer{position:absolute;top:0;bottom:0;right:0;left:34%;width:66%;height:100%;background:transparent;--poster-color:transparent;
+  transition:opacity .9s cubic-bezier(.5,.1,.2,1);opacity:0;pointer-events:none}
+.mv-layer.on{opacity:1;pointer-events:auto}
+@media(max-width:900px){.mv-layer{left:0;width:100%}}
+.scene-grad-top{position:absolute;inset:0 0 auto 0;height:120px;background:linear-gradient(180deg,rgba(8,12,17,.7),transparent);pointer-events:none;z-index:5}
+.scene-grad-bot{position:absolute;inset:auto 0 0 0;height:240px;background:linear-gradient(0deg,rgba(8,12,17,.92),transparent);pointer-events:none;z-index:5}
+
+/* TRUE 3D hotspots: model-viewer positions the slotted element itself (via data-position),
+   so no position:absolute/top/left of our own here — only visual styling. */
+.mvhot-wrap{display:flex;align-items:flex-start;pointer-events:auto;z-index:6}
+.mvhot-wrap[hidden]{display:none}
+.mvhot-badge{width:34px;height:34px;border-radius:50%;flex-shrink:0;position:relative;cursor:pointer;
+  background:radial-gradient(circle at 34% 28%,#ffe28a,#f2b90c 60%,#d99a00 100%);
+  border:2px solid rgba(255,255,255,.9);
+  box-shadow:0 0 0 6px rgba(255,205,60,.28),0 0 16px rgba(255,195,40,.55),0 2px 10px rgba(0,0,0,.45);
+  animation:hotpulse 2.4s ease-in-out infinite}
+.mvhot-badge::before,.mvhot-badge::after{content:"";position:absolute;top:50%;left:50%;background:#fff;border-radius:1px}
+.mvhot-badge::before{width:14px;height:3px;transform:translate(-50%,-50%)}
+.mvhot-badge::after{width:3px;height:14px;transform:translate(-50%,-50%)}
+@keyframes hotpulse{0%,100%{box-shadow:0 0 0 6px rgba(255,205,60,.28),0 0 16px rgba(255,195,40,.55),0 2px 10px rgba(0,0,0,.45)}
+  50%{box-shadow:0 0 0 9px rgba(255,205,60,.16),0 0 22px rgba(255,195,40,.75),0 2px 10px rgba(0,0,0,.45)}}
+.mvhot-wrap.focus .mvhot-badge{box-shadow:0 0 0 6px rgba(107,255,140,.4),0 0 18px rgba(107,255,140,.75),0 2px 10px rgba(0,0,0,.45)}
+#roverLeaderPath{fill:none;stroke:#f5c542;stroke-width:3;stroke-linecap:round}
+.mvhot-card{margin-left:16px;width:min(260px,72vw);max-height:min(50vh,320px);overflow:auto;
+  background:#fff;border-radius:2px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.modal-top{background:#2f5233;padding:9px 14px}
+.modal-title{font-family:var(--disp);font-weight:700;font-size:13px;line-height:1.25;letter-spacing:.01em;color:#fff}
+.modal-body{padding:11px 14px}
+.modal-desc{font-size:11.5px;line-height:1.55;color:#33463c}
+@media(max-width:600px){.mvhot-card{width:min(210px,64vw)}.modal-top{padding:8px 12px}.modal-body{padding:9px 12px}}
+
+.calib-hint{position:absolute;left:50%;top:66px;transform:translateX(-50%);z-index:30;
+  background:rgba(20,15,5,.92);border:1px solid rgba(255,195,40,.5);color:#ffd97a;
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding:8px 14px;border-radius:3px;
+  white-space:nowrap;pointer-events:none}
+.calib-hint code{color:#fff;background:rgba(255,255,255,.12);padding:1px 5px;border-radius:2px}
+
+/* hero copy */
+.hero{position:absolute;left:clamp(16px,4vw,54px);top:clamp(90px,14vh,150px);z-index:14;max-width:min(560px,74vw)}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--signal);text-transform:uppercase;margin-bottom:18px}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--signal)}
+.hero h1{font-family:var(--disp);font-weight:900;line-height:.92;letter-spacing:-.01em;
+  font-size:clamp(40px,7.4vw,82px);text-transform:uppercase;text-shadow:0 6px 40px rgba(0,0,0,.6)}
+.hero h1 .l2{-webkit-text-stroke:1px rgba(255,255,255,.18);color:transparent}
+.hero p{margin-top:20px;max-width:440px;font-size:15px;line-height:1.6;color:var(--txt2)}
+.hero-cta{margin-top:28px;display:inline-flex;align-items:center;gap:10px;padding:14px 24px;background:var(--signal);color:#101;
+  font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;border:none;transition:.2s}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(245,166,35,.3)}
+.hero.hide{opacity:0;visibility:hidden;transition:opacity .35s}
+
+/* ============ STEP RAIL ============ */
+.rail{position:absolute;left:0;right:0;bottom:0;z-index:20;padding:0 clamp(14px,3vw,30px) 20px}
+.rail-inner{display:flex;align-items:center;gap:0;max-width:1180px}
+.rchip{position:relative;flex:1;min-width:0;padding:14px 12px 15px;background:transparent;border:none;border-top:2px solid var(--line2);
+  text-align:left;color:var(--txt3);transition:.3s;display:flex;flex-direction:column;gap:5px}
+.rchip:hover{border-top-color:var(--txt2);color:var(--txt2)}
+.rchip.on{border-top-color:var(--signal);color:var(--txt)}
+.rchip .rn{font-family:var(--mono);font-size:10px;letter-spacing:.12em}
+.rchip .rt{font-family:var(--disp);font-weight:600;font-size:12.5px;line-height:1.15;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rchip.on .rn{color:var(--signal)}
+.rail-tools{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.tour-btn{display:inline-flex;align-items:center;gap:9px;padding:8px 15px;border:1px solid var(--line2);background:rgba(19,27,37,.7);
+  color:var(--txt2);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;transition:.2s}
+.tour-btn:hover{border-color:var(--signal);color:var(--signal)}
+.tour-btn.on{border-color:var(--signal);color:var(--signal);background:rgba(245,166,35,.08)}
+.tour-ic{width:8px;height:8px;background:var(--signal);border-radius:1px}
+.tour-btn.on .tour-ic{clip-path:polygon(0 0,100% 50%,0 100%);border-radius:0}
+.rail-hint{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--txt3);text-transform:uppercase}
+@media(max-width:760px){
+  .rail-inner{overflow-x:auto;gap:0;-webkit-overflow-scrolling:touch}
+  .rchip{flex:0 0 52%} .rchip .rt{white-space:normal}
+  .hero h1{font-size:clamp(38px,13vw,60px)} .hero{max-width:88vw}
+}
+
+/* ============ SECTIONS ============ */
+.sec{position:relative;padding:clamp(70px,10vh,120px) clamp(16px,5vw,80px)}
+.sec-head{max-width:760px;margin-bottom:48px}
+.sec-eye{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--signal);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.sec-eye::before{content:"";width:22px;height:1px;background:var(--signal)}
+.sec h2{font-family:var(--disp);font-weight:800;font-size:clamp(28px,4.6vw,52px);line-height:1;letter-spacing:-.01em;text-transform:uppercase;margin-top:16px}
+.sec-lead{font-size:15.5px;line-height:1.65;color:var(--txt2);margin-top:18px;max-width:640px}
+
+.rover3d{background:radial-gradient(120% 90% at 70% 10%,#16202c 0%,var(--pit) 55%,var(--void) 100%);border-top:1px solid var(--line)}
+.mv-shell{position:relative;display:grid;grid-template-columns:1fr 320px;gap:0;border:1px solid var(--line2);background:rgba(10,15,21,.6);min-height:560px}
+model-viewer{position:relative;width:100%;height:100%;min-height:560px;background:transparent;--poster-color:transparent}
+.mv-side{border-left:1px solid var(--line);padding:26px 24px;display:flex;flex-direction:column;gap:2px;background:rgba(19,27,37,.5)}
+.mv-side h3{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px;color:var(--txt)}
+.sub{display:flex;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.sub-ic{width:30px;height:30px;flex-shrink:0;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:14px}
+.sub-nm{font-size:13px;font-weight:600;color:var(--txt)}
+.sub-sb{font-family:var(--mono);font-size:9.5px;color:var(--txt3);letter-spacing:.06em;margin-top:2px}
+.mv-note{position:absolute;left:18px;bottom:16px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--txt3);text-transform:uppercase;pointer-events:none}
+@media(max-width:900px){.mv-shell{grid-template-columns:1fr}.mv-side{border-left:none;border-top:1px solid var(--line)}model-viewer{min-height:420px}}
+
+.safe{background:var(--haze);color:#12202e;border-top:1px solid rgba(0,0,0,.06)}
+.safe .sec-eye{color:var(--go-d)}.safe .sec-eye::before{background:var(--go-d)}
+.safe h2{color:#0e1a26}
+.safe-lead{font-size:15.5px;line-height:1.65;color:#41566a;margin-top:18px;max-width:640px}
+.link-viz{position:relative;margin-top:52px;border:1px solid rgba(0,0,0,.1);background:#fff;overflow:hidden}
+.linksvg{width:100%;display:block}
+.safe-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid rgba(0,0,0,.08)}
+.sstat{padding:22px 20px;border-right:1px solid rgba(0,0,0,.08)}
+.sstat:last-child{border-right:none}
+.sstat .v{font-family:var(--disp);font-weight:800;font-size:clamp(26px,3.5vw,38px);line-height:1;color:#0e1a26}
+.sstat .v .u{font-size:15px;color:#5a6f82;font-weight:600}
+.sstat .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:#6a7f92;text-transform:uppercase;margin-top:9px}
+@media(max-width:720px){.safe-stats{grid-template-columns:repeat(2,1fr)}.sstat:nth-child(2n){border-right:none}.sstat{border-bottom:1px solid rgba(0,0,0,.08)}}
+
+.caps{background:var(--pit);border-top:1px solid var(--line)}
+.cap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.cap{background:var(--card);padding:28px 24px;transition:.3s;position:relative}
+.cap:hover{background:#1c2836}
+.cap-n{font-family:var(--mono);font-size:10px;color:var(--txt3);letter-spacing:.14em}
+.cap h3{font-family:var(--disp);font-weight:700;font-size:17px;letter-spacing:.02em;margin:14px 0 8px;text-transform:uppercase}
+.cap p{font-size:13px;line-height:1.55;color:var(--txt2)}
+.cap .bar{position:absolute;left:0;top:0;width:3px;height:0;background:var(--signal);transition:.4s}
+.cap:hover .bar{height:100%}
+@media(max-width:860px){.cap-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.cap-grid{grid-template-columns:1fr}}
+
+.cta{background:linear-gradient(120deg,var(--mtl-d),#0e2a4d);border-top:1px solid var(--line);text-align:center;padding:clamp(70px,10vh,110px) 20px}
+.cta h2{font-family:var(--disp);font-weight:900;font-size:clamp(30px,5vw,58px);text-transform:uppercase;line-height:.95;letter-spacing:-.01em}
+.cta p{max-width:520px;margin:20px auto 0;color:#cfe0f2;font-size:15px;line-height:1.6}
+.cta-btn{display:inline-flex;align-items:center;gap:10px;margin-top:32px;padding:15px 28px;background:var(--signal);color:#101;
+  font-family:var(--disp);font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;transition:.2s;border:none}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(245,166,35,.35)}
+footer{background:var(--void);border-top:1px solid var(--line);padding:44px clamp(16px,5vw,80px) 40px;
+  display:flex;flex-wrap:wrap;gap:26px;align-items:center;justify-content:space-between}
+.foot-brand{display:flex;align-items:center;gap:14px}
+.foot-brand .brand-main{font-size:22px}
+.foot-meta{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--txt3);line-height:1.9;text-align:right}
+.foot-meta .go{color:var(--go)}
+
+.loader{position:fixed;inset:0;z-index:300;background:var(--void);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .6s,visibility .6s}
+.loader.gone{opacity:0;visibility:hidden}
+.ld-logo{font-family:var(--disp);font-weight:900;font-size:34px;letter-spacing:.08em}
+.ld-logo em{color:var(--mtl);font-style:normal}
+.ld-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;color:var(--txt3);text-transform:uppercase}
+.ld-bar{width:220px;height:2px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}
+.ld-fill{height:100%;width:0;background:var(--signal);transition:width .2s}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="ld-logo">MTL <em>ROVER</em></div>
+  <div class="ld-sub">World of Remote Dozing · Rover-001 · PT Berau Coal</div>
+  <div class="ld-bar"><div class="ld-fill" id="ldfill"></div></div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="diamond">MTL</div>
+    <div class="brand-txt"><div class="brand-main">MTL <em>ROVER</em></div><div class="brand-sub">Mutiara Tanjung Lestari · Remote Operations</div></div>
+  </div>
+  <div class="top-right">
+    <div class="top-unit">ROVER-001 · AREA DISPOSAL 01</div>
+    <div class="status"><span class="sdot"></span>Link Stabil</div>
+  </div>
+</header>
+
+<!-- ============ STAGE ============ -->
+<section class="stage" id="stage">
+  <div class="scene-wrap">
+    <model-viewer id="mvStage" class="mv-layer on" src="Rover%20Mining.glb" alt="Model 3D Rover Mining"
+      camera-controls touch-action="pan-y" interaction-prompt="none" exposure="1.05" shadow-intensity="1" shadow-softness="0.9"
+      autoplay animation-name="Animation"
+      environment-image="neutral" camera-orbit="35deg 62deg 240m" field-of-view="30deg"
+      min-camera-orbit="auto 20deg auto" max-camera-orbit="auto 88deg auto">
+      <!-- TRUE 3D hotspots via model-viewer's native slot="hotspot-N" + data-position mechanism:
+           these stick to the clicked surface point and follow the model when it's dragged/rotated.
+           Only the current step's wrap is unhidden; the rail/tour below drives which one shows. -->
+      <div class="mvhot-wrap" id="hotspotWrap0" slot="hotspot-0" data-position="0 0 0" data-normal="0 1 0">
+        <div class="mvhot-badge" aria-label="Tahap 1"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Register Area Kritis</div></div>
+          <div class="modal-body"><p class="modal-desc">Identifikasi dan register area dumping berisiko tinggi ke dalam sistem.</p></div></div>
+      </div>
+      <div class="mvhot-wrap" id="hotspotWrap1" slot="hotspot-1" data-position="0 0 0" data-normal="0 1 0" hidden>
+        <div class="mvhot-badge" aria-label="Tahap 2"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Pengajuan Izin Kerja Khusus</div></div>
+          <div class="modal-body"><p class="modal-desc">Ajukan izin kerja khusus untuk metode Remote Dozer sesuai prosedur keselamatan.</p></div></div>
+      </div>
+      <div class="mvhot-wrap" id="hotspotWrap2" slot="hotspot-2" data-position="0 0 0" data-normal="0 1 0" hidden>
+        <div class="mvhot-badge" aria-label="Tahap 3"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Mobilisasi ROVER (Unit Caravan)</div></div>
+          <div class="modal-body"><p class="modal-desc">Mobilisasi unit caravan (ROVER) dan operator menuju lokasi kerja untuk mendukung operasi tele-remote.</p></div></div>
+      </div>
+      <div class="mvhot-wrap" id="hotspotWrap3" slot="hotspot-3" data-position="0 0 0" data-normal="0 1 0" hidden>
+        <div class="mvhot-badge" aria-label="Tahap 4"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Setting Koneksi dengan Dozer di Lokasi</div></div>
+          <div class="modal-body"><p class="modal-desc">Pengaturan koneksi antara unit caravan, sistem tele-remote, dan dozer hingga link komunikasi stabil.</p></div></div>
+      </div>
+      <div class="mvhot-wrap" id="hotspotWrap4" slot="hotspot-4" data-position="0 0 0" data-normal="0 1 0" hidden>
+        <div class="mvhot-badge" aria-label="Tahap 5"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Operasi Tele-Remote Dozer</div></div>
+          <div class="modal-body"><p class="modal-desc">Operator mengoperasikan unit dozer dengan sistem tele-remote dari dalam caravan pada jarak aman 500–1000 meter.</p></div></div>
+      </div>
+      <div class="mvhot-wrap" id="hotspotWrap5" slot="hotspot-5" data-position="0 0 0" data-normal="0 1 0" hidden>
+        <div class="mvhot-badge" aria-label="Tahap 6"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Pindah ke Area Berikutnya</div></div>
+          <div class="modal-body"><p class="modal-desc">ROVER dipindahkan ke target area berikutnya untuk melanjutkan operasi dengan dozer bergantian.</p></div></div>
+      </div>
+    </model-viewer>
+  </div>
+  <div class="scene-grad-top"></div>
+  <div class="scene-grad-bot"></div>
+
+  <!-- TEMPORARY calibration helper: click anywhere on the model to snap the current
+       step's marker to that exact 3D surface point. Tell me once all 6 are confirmed
+       and I'll remove this block + the calibration listener in the script. -->
+  <div class="calib-hint" id="calibHint">🎯 Klik pada model untuk menempatkan Titik <b id="calibStepNo">1</b> &nbsp;|&nbsp; posisi: <code id="calibPos">0 0 0</code></div>
+
+  <div class="hero" id="hero">
+    <div class="eyebrow">MTL ROVER · Remote Dozing</div>
+    <h1>WORLD OF<br><span class="l2">REMOTE DOZING</span></h1>
+    <p>Pengalaman interaktif operasi Remote Dozing PT Berau Coal — didukung MTL ROVER, unit caravan tele-remote. Jelajahi alur 6 tahap, dari ruang kontrol hingga dozer beroperasi di titik disposal.</p>
+    <button class="hero-cta" id="startBtn">▶ Mulai Alur Operasi</button>
+  </div>
+
+  <div class="rail">
+    <div class="rail-tools">
+      <button class="tour-btn" id="tourBtn"><span class="tour-ic"></span><span id="tourLbl">Auto-Tour</span></button>
+      <span class="rail-hint">Pilih tahap untuk melihat detail</span>
+    </div>
+    <div class="rail-inner" id="rail"></div>
+  </div>
+</section>
+
+<!-- ============ 3D ROVER CLOSE-UP ============ -->
+<section class="sec rover3d" id="rover">
+  <div class="sec-head">
+    <span class="sec-eye">Updated Asset · Rover Mining</span>
+    <h2>MTL WORLD · Asset Rover Mining</h2>
+    <p class="sec-lead">Tampilan asset MTL World pada section ini telah diganti menggunakan file <b style="color:var(--txt)">Rover Mining.glb</b>. Putar model untuk melihat bentuk asset secara menyeluruh.</p>
+  </div>
+  <div class="mv-shell">
+    <model-viewer id="mv" src="Rover%20Mining.glb" alt="Model 3D Rover Mining" camera-controls touch-action="pan-y"
+      interaction-prompt="none" shadow-intensity="1" shadow-softness="0.9"
+      autoplay animation-name="Animation"
+      exposure="1.05" environment-image="neutral" camera-orbit="45deg 72deg 220m" min-camera-orbit="auto 0deg auto" field-of-view="30deg">
+      <!-- TRUE 3D hotspots (slot="hotspot-N" + data-position): stick to the clicked surface
+           point and follow the model when dragged/rotated. All 6 stay visible together;
+           click a badge to select it as the current calibration target (highlighted). -->
+      <div class="mvhot-wrap focus" id="roverHotspotWrap0" slot="hotspot-0" data-position="0 0 0" data-normal="0 1 0">
+        <div class="mvhot-badge" aria-label="Tahap 1"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Register Area Kritis</div></div>
+          <div class="modal-body"><p class="modal-desc">Identifikasi dan register area dumping berisiko tinggi ke dalam sistem.</p></div></div>
+      </div>
+      <div class="mvhot-wrap" id="roverHotspotWrap1" slot="hotspot-1" data-position="0 0 0" data-normal="0 1 0">
+        <div class="mvhot-badge" aria-label="Tahap 2"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Pengajuan Izin Kerja Khusus</div></div>
+          <div class="modal-body"><p class="modal-desc">Ajukan izin kerja khusus untuk metode Remote Dozer sesuai prosedur keselamatan.</p></div></div>
+      </div>
+      <div class="mvhot-wrap" id="roverHotspotWrap2" slot="hotspot-2" data-position="0 0 0" data-normal="0 1 0">
+        <div class="mvhot-badge" aria-label="Tahap 3"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Mobilisasi ROVER (Unit Caravan)</div></div>
+          <div class="modal-body"><p class="modal-desc">Mobilisasi unit caravan (ROVER) dan operator menuju lokasi kerja untuk mendukung operasi tele-remote.</p></div></div>
+      </div>
+      <div class="mvhot-wrap" id="roverHotspotWrap3" slot="hotspot-3" data-position="0 0 0" data-normal="0 1 0">
+        <div class="mvhot-badge" aria-label="Tahap 4"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Setting Koneksi dengan Dozer di Lokasi</div></div>
+          <div class="modal-body"><p class="modal-desc">Pengaturan koneksi antara unit caravan, sistem tele-remote, dan dozer hingga link komunikasi stabil.</p></div></div>
+      </div>
+      <div class="mvhot-wrap" id="roverHotspotWrap4" slot="hotspot-4" data-position="0 0 0" data-normal="0 1 0">
+        <div class="mvhot-badge" aria-label="Tahap 5"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Operasi Tele-Remote Dozer</div></div>
+          <div class="modal-body"><p class="modal-desc">Operator mengoperasikan unit dozer dengan sistem tele-remote dari dalam caravan pada jarak aman 500–1000 meter.</p></div></div>
+      </div>
+      <div class="mvhot-wrap" id="roverHotspotWrap5" slot="hotspot-5" data-position="0 0 0" data-normal="0 1 0">
+        <div class="mvhot-badge" aria-label="Tahap 6"></div>
+        <div class="mvhot-card"><div class="modal-top"><div class="modal-title">Pindah ke Area Berikutnya</div></div>
+          <div class="modal-body"><p class="modal-desc">ROVER dipindahkan ke target area berikutnya untuk melanjutkan operasi dengan dozer bergantian.</p></div></div>
+      </div>
+      <svg id="roverLeaderSvg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:1"><path id="roverLeaderPath"></path></svg>
+    </model-viewer>
+    <div class="mv-side">
+      <h3>Asset Aktif</h3>
+      <div class="sub"><div class="sub-ic">🚛</div><div><div class="sub-nm">Rover Mining Asset</div><div class="sub-sb">Menggantikan asset visual sebelumnya pada tampilan MTL World</div></div></div>
+      <div class="sub"><div class="sub-ic">🧭</div><div><div class="sub-nm">Mode Tinjau</div><div class="sub-sb">Gunakan drag untuk rotasi dan scroll untuk zoom</div></div></div>
+      <div class="sub"><div class="sub-ic">📦</div><div><div class="sub-nm">Sumber Asset</div><div class="sub-sb">File lokal: Rover Mining.glb</div></div></div>
+      <div class="sub"><div class="sub-ic">🛠️</div><div><div class="sub-nm">Kesiapan Edit</div><div class="sub-sb">Dapat dilanjutkan untuk modifikasi visual lanjutan di Blender</div></div></div>
+    </div>
+    <div class="mv-note">🖱 Drag untuk memutar · Scroll untuk zoom · Klik titik kuning untuk pilih, lalu klik model untuk kalibrasi</div>
+    <!-- TEMPORARY calibration helper for this section — click the model to snap the current
+         step's marker to that exact 3D surface point. Tell me the coordinates once confirmed. -->
+    <div class="calib-hint" id="roverCalibHint" style="position:absolute;left:16px;top:16px;transform:none">🎯 Klik pada model untuk menempatkan Titik <b id="roverCalibStepNo">1</b> &nbsp;|&nbsp; posisi: <code id="roverCalibPos">0 0 0</code></div>
+  </div>
+</section>
+
+<!-- ============ SAFE DISTANCE ============ -->
+<section class="sec safe" id="safe">
+  <div class="sec-head">
+    <span class="sec-eye">Zero Exposure · Jarak Aman</span>
+    <h2 style="color:#0e1a26">Operator Keluar dari Zona Bahaya</h2>
+    <p class="safe-lead">Inti dari remote dozing: memindahkan manusia keluar dari area dumping berisiko tinggi. Operator bekerja dari dalam ROVER, terhubung ke dozer lewat link komunikasi stabil pada rentang <b style="color:#0e1a26">500–1000 meter</b>.</p>
+  </div>
+  <div class="link-viz">
+    <svg class="linksvg" viewBox="0 0 1200 260" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagram link tele-remote operator ke dozer">
+      <defs><linearGradient id="grd" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2680e8"/><stop offset="1" stop-color="#6ba043"/></linearGradient></defs>
+      <rect x="0" y="196" width="1200" height="64" fill="#eef2f6"/>
+      <line x1="0" y1="196" x2="1200" y2="196" stroke="#d3dbe3" stroke-width="1.5"/>
+      <g transform="translate(90,120)">
+        <rect x="0" y="18" width="150" height="58" fill="#fff" stroke="#0e1a26" stroke-width="2"/>
+        <rect x="-42" y="40" width="46" height="36" fill="#e9eef3" stroke="#0e1a26" stroke-width="2"/>
+        <circle cx="14" cy="80" r="10" fill="#26313d"/><circle cx="120" cy="80" r="10" fill="#26313d"/><circle cx="-28" cy="80" r="9" fill="#26313d"/>
+        <line x1="118" y1="18" x2="118" y2="-40" stroke="#0e1a26" stroke-width="3"/>
+        <rect x="110" y="-52" width="16" height="14" fill="#6ba043"/>
+        <text x="54" y="52" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#1a63c0">MTL</text>
+        <text x="45" y="100" font-family="JetBrains Mono" font-size="9" fill="#5a6f82">ROVER · OPERATOR</text>
+      </g>
+      <g transform="translate(980,150)">
+        <rect x="0" y="6" width="86" height="34" rx="4" fill="#f5a623" stroke="#0e1a26" stroke-width="2"/>
+        <rect x="20" y="-16" width="42" height="24" rx="3" fill="#f5a623" stroke="#0e1a26" stroke-width="2"/>
+        <path d="M-6 44 L92 44 L86 58 L0 58 Z" fill="#3a4650"/>
+        <rect x="-20" y="10" width="10" height="40" fill="#26313d"/>
+        <path d="M-20 12 L-2 6 L-2 14 L-20 20 Z" fill="#26313d"/>
+        <text x="8" y="78" font-family="JetBrains Mono" font-size="9" fill="#5a6f82">DOZER · TANPA OPERATOR</text>
+      </g>
+      <g stroke="#2680e8" fill="none" stroke-width="2" opacity="0.8">
+        <path d="M214 76 q26 -22 0 -50"/><path d="M226 82 q40 -30 0 -66"/>
+      </g>
+      <line x1="240" y1="150" x2="972" y2="168" stroke="url(#grd)" stroke-width="3" stroke-dasharray="3 8"/>
+      <circle r="5" fill="#f5a623"><animateMotion dur="3s" repeatCount="indefinite" path="M240 150 L972 168"/></circle>
+      <line x1="240" y1="40" x2="972" y2="40" stroke="#0e1a26" stroke-width="1"/>
+      <line x1="240" y1="32" x2="240" y2="48" stroke="#0e1a26" stroke-width="1"/><line x1="972" y1="32" x2="972" y2="48" stroke="#0e1a26" stroke-width="1"/>
+      <rect x="540" y="24" width="132" height="30" fill="#0e1a26"/>
+      <text x="606" y="44" text-anchor="middle" font-family="Archivo" font-weight="800" font-size="15" fill="#fff">500 – 1000 M</text>
+    </svg>
+    <div class="safe-stats">
+      <div class="sstat"><div class="v">500–1000<span class="u"> m</span></div><div class="k">Jarak Operator → Dozer</div></div>
+      <div class="sstat"><div class="v">&lt;20<span class="u"> ms</span></div><div class="k">Latensi Kontrol Target</div></div>
+      <div class="sstat"><div class="v">~2<span class="u"> shift</span></div><div class="k">Estimasi Instalasi Link</div></div>
+      <div class="sstat"><div class="v">0</div><div class="k">Operator di Zona Bahaya</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAPABILITIES ============ -->
+<section class="sec caps" id="caps">
+  <div class="sec-head"><span class="sec-eye">System Capability</span><h2>Yang Dibawa Setiap ROVER</h2></div>
+  <div class="cap-grid" id="capGrid"></div>
+</section>
+
+<section class="cta">
+  <h2>Satu Unit Pindah,<br>Operasi Lanjut Terus</h2>
+  <p>Setelah satu area selesai, ROVER dimobilisasi ke target berikutnya — dozer bekerja bergantian, produksi tetap jalan, manusia tetap di luar zona bahaya.</p>
+  <button class="cta-btn" id="restartBtn">↻ Ulangi Alur Operasi</button>
+</section>
+
+<footer>
+  <div class="foot-brand">
+    <div class="diamond">MTL</div>
+    <div class="brand-txt"><div class="brand-main">MTL <em>ROVER</em></div><div class="brand-sub">Mutiara Tanjung Lestari × Berau Coal</div></div>
+  </div>
+  <div class="foot-meta">ROVER-001 · REMOTE DOZING PROGRAM<br><span class="go">● LINK STABIL</span> · AREA DISPOSAL 01<br>Konsep visual · bukan dokumen operasional resmi</div>
+</footer>
+
+<script>
+/* ---------- STEP DATA ---------- */
+const STEPS=[
+ {title:"Register Area Kritis",
+  desc:"Identifikasi dan register area dumping berisiko tinggi ke dalam sistem, dari ruang kontrol. Peta area (KERIS) menandai jalur aman, buffer zone, batas disposal, dan area terlarang sebelum pekerjaan dimulai."},
+ {title:"Pengajuan Izin Kerja Khusus",
+  desc:"Ajukan izin kerja khusus untuk metode Remote Dozer sesuai prosedur keselamatan, langsung dari meja kerja ruang kontrol. Pekerjaan hanya berjalan setelah status permit disetujui."},
+ {title:"Mobilisasi ROVER (Unit Caravan)",
+  desc:"Unit caravan ROVER berjalan menuju titik disposal (crest) untuk mendukung operasi tele-remote. Unit dozer sudah standby lebih dulu di titik tersebut, menanti link komunikasi terpasang."},
+ {title:"Setting Koneksi dengan Dozer",
+  desc:"Pengaturan koneksi antara unit caravan, sistem tele-remote, dan dozer di lokasi kerja hingga link komunikasi stabil dan siap dioperasikan."},
+ {title:"Operasi Tele-Remote Dozer",
+  desc:"Dozer mulai bekerja lewat sistem tele-remote dari dalam caravan pada jarak aman 500–1000 meter — sinyal jaringan ROVER menjaga koneksi kontrol tetap stabil selama dozer bergerak."},
+ {title:"Pindah ke Area Berikutnya",
+  desc:"ROVER berjalan meninggalkan titik disposal menuju target area berikutnya untuk melanjutkan operasi dengan dozer bergantian — produksi berlanjut tanpa mengekspos operator ke zona bahaya."},
+];
+const CAPS=[
+ ["01","Mobile BTS","Sel privat 4G/5G LTE menutup area kerja — backbone komunikasi kontrol & video."],
+ ["02","VSAT Uplink","Dish 0.9 m ke satelit LEO sebagai jalur backhaul di lokasi tanpa fiber."],
+ ["03","Mast & Antena","Menara lattice auto-deploy 10 m dengan panel antena sektoral & loop."],
+ ["04","Edge Compute","Server MEC memproses video dan perintah kontrol untuk latensi rendah."],
+ ["05","Ruang Operator","Stasiun tele-remote multi-layar di dalam kabin — visibilitas penuh area kerja."],
+ ["06","Power & Safety","Genset + UPS LiFePO₄, E-Stop tersertifikasi, dan cybersecurity IEC 62443."],
+];
+
+/* camera framing per step — pans the shared camera as the rail/tour moves between steps */
+const CAM_STEPS=[
+  "45deg 72deg 220m",
+  "55deg 68deg 190m",
+  "30deg 60deg 220m",
+  "70deg 65deg 190m",
+  "145deg 60deg 190m",
+  "205deg 60deg 220m",
+];
+
+/* ---------- BUILD RAIL + CAPS ---------- */
+const rail=document.getElementById('rail');
+STEPS.forEach((s,i)=>{
+  const b=document.createElement('button');
+  b.className='rchip'+(i===0?' on':'');b.dataset.step=i;
+  b.innerHTML=`<span class="rn">TAHAP 0${i+1}</span><span class="rt">${s.title}</span>`;
+  b.onclick=()=>{ focusStep(i); stopTour(); };
+  rail.appendChild(b);
+});
+const capGrid=document.getElementById('capGrid');
+CAPS.forEach(c=>{
+  const d=document.createElement('div');d.className='cap';
+  d.innerHTML=`<div class="bar"></div><div class="cap-n">${c[0]}</div><h3>${c[1]}</h3><p>${c[2]}</p>`;
+  capGrid.appendChild(d);
+});
+
+/* ---------- STAGE / HOTSPOTS: only the current step's marker is unhidden ---------- */
+const mvStage=document.getElementById('mvStage');
+const hero=document.getElementById('hero');
+const hotspotWraps=STEPS.map((s,i)=>document.getElementById('hotspotWrap'+i));
+let cur=0;
+
+function focusStep(i){
+  if(i<0)i=0; if(i>5)i=5;
+  cur=i; hero.classList.add('hide');
+  hotspotWraps.forEach((w,wi)=>w.hidden = wi!==i);
+  mvStage.cameraOrbit = CAM_STEPS[i];
+  document.querySelectorAll('.rchip').forEach((c,ci)=>c.classList.toggle('on',ci===i));
+  calibStepNo.textContent = i+1;
+  calibPos.textContent = hotspotWraps[i].dataset.position;
+}
+document.querySelectorAll('.mvhot-badge').forEach((b,i)=>{
+  b.addEventListener('click',(e)=>{ e.stopPropagation(); focusStep(i+1); stopTour(); });
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'){ focusStep(Math.min(cur+1,5)); stopTour(false); }
+  if(e.key==='ArrowLeft'){ focusStep(Math.max(cur-1,0)); stopTour(false); }
+});
+document.getElementById('startBtn').onclick=()=>focusStep(0);
+document.getElementById('restartBtn').onclick=(e)=>{ e.preventDefault(); focusStep(0); window.scrollTo({top:0,behavior:'smooth'}); };
+
+/* ---------- AUTO TOUR ---------- */
+let tour=null;const tourBtn=document.getElementById('tourBtn'),tourLbl=document.getElementById('tourLbl');
+function startTour(){
+  if(tour)return; tourBtn.classList.add('on'); tourLbl.textContent='Berjalan…';
+  tour=setInterval(()=>{ focusStep(cur>=5?0:cur+1); },5200);
+}
+function stopTour(resetLabel=true){ if(tour){clearInterval(tour);tour=null} tourBtn.classList.remove('on'); if(resetLabel)tourLbl.textContent='Auto-Tour'; }
+tourBtn.onclick=()=>{ tour?stopTour():startTour() };
+
+/* ---------- TEMPORARY calibration: click the model to snap the CURRENT
+   step's hotspot to that exact 3D surface point. Delete this block (and
+   #calibHint in the HTML) once all 6 points are confirmed correct. ---------- */
+const calibStepNo=document.getElementById('calibStepNo'), calibPos=document.getElementById('calibPos');
+calibPos.textContent = hotspotWraps[0].dataset.position;
+mvStage.addEventListener('click', (ev)=>{
+  const rect=mvStage.getBoundingClientRect();
+  const hit=mvStage.positionAndNormalFromPoint(ev.clientX-rect.left, ev.clientY-rect.top);
+  if(!hit)return;
+  const pos=`${hit.position.x.toFixed(3)} ${hit.position.y.toFixed(3)} ${hit.position.z.toFixed(3)}`;
+  const nrm=`${hit.normal.x.toFixed(3)} ${hit.normal.y.toFixed(3)} ${hit.normal.z.toFixed(3)}`;
+  hotspotWraps[cur].dataset.position=pos;
+  hotspotWraps[cur].dataset.normal=nrm;
+  calibPos.textContent=pos;
+});
+
+/* ---------- 3D ROVER CLOSE-UP: all 6 hotspots visible together, route line connecting them ---------- */
+const mvRover=document.getElementById('mv');
+const roverWraps=STEPS.map((s,i)=>document.getElementById('roverHotspotWrap'+i));
+let roverCur=0; // which point is the current calibration target (click its badge to select)
+
+function selectRoverPoint(i){
+  roverCur=i;
+  roverWraps.forEach((w,wi)=>w.classList.toggle('focus',wi===i));
+  roverCalibStepNo.textContent = i+1;
+  roverCalibPos.textContent = roverWraps[i].dataset.position;
+}
+roverWraps.forEach((w,i)=>{
+  w.querySelector('.mvhot-badge').addEventListener('click',(e)=>{ e.stopPropagation(); selectRoverPoint(i); });
+});
+
+/* calibration — click the model to snap the currently selected point's marker */
+const roverCalibStepNo=document.getElementById('roverCalibStepNo'), roverCalibPos=document.getElementById('roverCalibPos');
+roverCalibPos.textContent = roverWraps[0].dataset.position;
+mvRover.addEventListener('click', (ev)=>{
+  const rect=mvRover.getBoundingClientRect();
+  const hit=mvRover.positionAndNormalFromPoint(ev.clientX-rect.left, ev.clientY-rect.top);
+  if(!hit)return;
+  const pos=`${hit.position.x.toFixed(3)} ${hit.position.y.toFixed(3)} ${hit.position.z.toFixed(3)}`;
+  const nrm=`${hit.normal.x.toFixed(3)} ${hit.normal.y.toFixed(3)} ${hit.normal.z.toFixed(3)}`;
+  roverWraps[roverCur].dataset.position=pos;
+  roverWraps[roverCur].dataset.normal=nrm;
+  roverCalibPos.textContent=pos;
+});
+
+/* route line: traces a path through all 6 badges in order, redrawn every frame so it
+   stays correct while the model is dragged/rotated (true 3D hotspots move on rotate) */
+const roverLeaderPath=document.getElementById('roverLeaderPath');
+(function drawRoverLeader(){
+  const svgR=document.getElementById('roverLeaderSvg').getBoundingClientRect();
+  const pts=roverWraps.map(w=>{
+    const r=w.querySelector('.mvhot-badge').getBoundingClientRect();
+    return [r.left+r.width/2-svgR.left, r.top+r.height/2-svgR.top];
+  });
+  let d=`M${pts[0][0]},${pts[0][1]}`;
+  for(let i=1;i<pts.length;i++){
+    const [x1,y1]=pts[i-1],[x2,y2]=pts[i], mx=(x1+x2)/2;
+    d+=` C${mx},${y1} ${mx},${y2} ${x2},${y2}`;
+  }
+  roverLeaderPath.setAttribute('d',d);
+  requestAnimationFrame(drawRoverLeader);
+})();
+
+/* ---------- LOADER ---------- */
+let p=0;const ldfill=document.getElementById('ldfill'),loader=document.getElementById('loader');
+const li=setInterval(()=>{p+=Math.random()*20;if(p>=100){p=100;clearInterval(li);
+  setTimeout(()=>{loader.classList.add('gone');},350);}
+  ldfill.style.width=p+'%';},160);
+</script>
+</body>
+</html>

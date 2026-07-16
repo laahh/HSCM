@@ -9,6 +9,7 @@ import { ENFORCEMENT, SUMMARY_CARDS, type SummaryCard } from "./data";
 
 type Props = {
   onBack?: () => void;
+  onNext?: () => void;
 };
 
 const PILLAR_ICON: Record<string, string> = {
@@ -209,7 +210,7 @@ function EnforcementBlock({
   );
 }
 
-export default function SummaryEnforcementSlide({ onBack }: Props) {
+export default function SummaryEnforcementSlide({ onBack, onNext }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const reduceMotion = useReducedMotion();
 
@@ -262,7 +263,18 @@ export default function SummaryEnforcementSlide({ onBack }: Props) {
                 </p>
               </div>
             </div>
-            <BerauCoalLogo height={34} />
+            <div className="flex items-center gap-3">
+              <BerauCoalLogo height={34} />
+              {onNext ? (
+                <button
+                  type="button"
+                  onClick={onNext}
+                  className="border border-[color:var(--green-deep)] bg-[color:var(--green-deep)] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white transition hover:bg-[color:var(--green-mid)]"
+                >
+                  Lanjut →
+                </button>
+              ) : null}
+            </div>
           </motion.div>
 
           <div className="mt-7 flex flex-col gap-6 lg:mt-8 lg:flex-row lg:items-start lg:justify-between">

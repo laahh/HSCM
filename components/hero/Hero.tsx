@@ -27,7 +27,14 @@ const item: Variants = {
   },
 };
 
-export default function Hero() {
+type HeroProps = {
+  variant?: "opening" | "closing";
+  onBack?: () => void;
+};
+
+export default function Hero({ variant = "opening", onBack }: HeroProps) {
+  const isClosing = variant === "closing";
+
   return (
     <section className="relative flex min-h-screen flex-col overflow-hidden">
       <ParallaxBackground />
@@ -40,6 +47,19 @@ export default function Hero() {
           transition={{ duration: 0.6, ease: EASE_OUT }}
           className="glass-chip flex items-center gap-3 rounded-2xl px-3 py-2 sm:gap-3.5 sm:px-4 sm:py-2.5"
         >
+          {isClosing && onBack ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onBack();
+              }}
+              className="text-[12px] font-semibold text-[var(--ink-soft)] transition hover:text-[var(--green-deep)]"
+              aria-label="Kembali"
+            >
+              ←
+            </button>
+          ) : null}
           <BerauCoalLogo height={40} priority className="rounded-md bg-white/90 p-0.5" />
           <div className="h-8 w-px shrink-0 bg-[var(--ink)]/15" aria-hidden />
           <div className="leading-tight">
@@ -66,23 +86,45 @@ export default function Hero() {
             <ColorDots />
           </motion.div>
 
-          <motion.h1
-            variants={item}
-            className="font-heading text-5xl font-extrabold leading-[1.02] tracking-tight text-[var(--ink)] sm:text-6xl lg:text-7xl"
-          >
-            Mengubah Ketidakpastian
-            <br />
-            Menjadi Keunggulan
-          </motion.h1>
+          {isClosing ? (
+            <>
+              <motion.h1
+                variants={item}
+                className="font-heading text-5xl font-extrabold leading-[1.02] tracking-tight text-[var(--ink)] sm:text-6xl lg:text-7xl"
+              >
+                Terima Kasih
+              </motion.h1>
 
-          <motion.p
-            variants={item}
-            className="max-w-xl font-body text-base leading-relaxed text-[var(--ink-soft)] sm:text-lg"
-          >
-            Kolaborasi Membangun Organisasi Berkinerja Tinggi untuk Stabilitas
-            dan Meningkatkan Daya Saing melalui Disiplin Operasional, Perbaikan
-            Berkelanjutan dan Inovasi.
-          </motion.p>
+              <motion.p
+                variants={item}
+                className="max-w-xl font-body text-base leading-relaxed text-[var(--ink-soft)] sm:text-lg"
+              >
+                Kolaborasi Membangun Organisasi Berkinerja Tinggi untuk Stabilitas
+                dan Meningkatkan Daya Saing melalui Disiplin Operasional, Perbaikan
+                Berkelanjutan dan Inovasi.
+              </motion.p>
+            </>
+          ) : (
+            <>
+              <motion.h1
+                variants={item}
+                className="font-heading text-5xl font-extrabold leading-[1.02] tracking-tight text-[var(--ink)] sm:text-6xl lg:text-7xl"
+              >
+                Mengubah Ketidakpastian
+                <br />
+                Menjadi Keunggulan
+              </motion.h1>
+
+              <motion.p
+                variants={item}
+                className="max-w-xl font-body text-base leading-relaxed text-[var(--ink-soft)] sm:text-lg"
+              >
+                Kolaborasi Membangun Organisasi Berkinerja Tinggi untuk Stabilitas
+                dan Meningkatkan Daya Saing melalui Disiplin Operasional, Perbaikan
+                Berkelanjutan dan Inovasi.
+              </motion.p>
+            </>
+          )}
         </motion.div>
 
         <motion.div

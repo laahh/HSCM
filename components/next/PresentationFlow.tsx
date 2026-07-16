@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import IntroSequence from "@/components/intro/IntroSequence";
+import Hero from "@/components/hero/Hero";
 import SystemDefenderSlide from "./system-defender/SystemDefenderSlide";
 import SafetyPerformanceSlide from "./safety-performance/SafetyPerformanceSlide";
 import LeadingPerformanceSlide from "./leading-performance/LeadingPerformanceSlide";
 import RekayasaPerformanceSlide from "./rekayasa/RekayasaPerformanceSlide";
 import SummaryEnforcementSlide from "./summary/SummaryEnforcementSlide";
 
-type Stage = "hero" | "intro" | "video" | "slide";
+type Stage = "hero" | "intro" | "video" | "slide" | "closing";
 type DeckPage = "tactical" | "performance" | "leading" | "rekayasa" | "summary";
 
 const FADE = { duration: 0.55, ease: [0.76, 0, 0.24, 1] as const };
@@ -54,6 +55,27 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
       </motion.div>
 
       <IntroSequence active={stage === "intro"} onComplete={() => setStage("video")} />
+
+      <AnimatePresence>
+        {stage === "closing" && (
+          <motion.div
+            key="closing"
+            className="fixed inset-0 z-[80] overflow-y-auto bg-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={FADE}
+          >
+            <Hero
+              variant="closing"
+              onBack={() => {
+                setDeckPage("summary");
+                setStage("slide");
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {(stage === "video" || stage === "slide") && (
@@ -160,7 +182,10 @@ export default function PresentationFlow({ children }: { children: ReactNode }) 
                     exit={{ opacity: 0, y: -16 }}
                     transition={{ duration: 0.35 }}
                   >
-                    <SummaryEnforcementSlide onBack={() => setDeckPage("rekayasa")} />
+                    <SummaryEnforcementSlide
+                      onBack={() => setDeckPage("rekayasa")}
+                      onNext={() => setStage("closing")}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>

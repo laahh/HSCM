@@ -530,36 +530,18 @@ function PyramidChart({
                   animate={
                     reveal
                       ? {
-                          opacity: [0.45, 1, 0.45],
+                          opacity: 1,
                           scaleX: 1,
-                          boxShadow: [
-                            "0 0 0 0 rgba(239,68,68,0)",
-                            "0 0 14px 3px rgba(239,68,68,0.4)",
-                            "0 0 0 0 rgba(239,68,68,0)",
-                          ],
+                          boxShadow: "0 0 10px 2px rgba(239,68,68,0.28)",
                         }
                       : { opacity: 0, scaleX: 0.86 }
                   }
                   transition={
                     reveal && !reduceMotion
                       ? {
-                          opacity: {
-                            duration: 2.0,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: (fallIn ? 0.35 : 0.2) + i * 0.12,
-                          },
-                          boxShadow: {
-                            duration: 2.0,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: (fallIn ? 0.35 : 0.2) + i * 0.12,
-                          },
-                          scaleX: {
-                            duration: 0.45,
-                            delay: (fallIn ? 0.18 : 0.75) + i * 0.08,
-                            ease: easeOut,
-                          },
+                          duration: 0.45,
+                          delay: (fallIn ? 0.18 : 0.75) + i * 0.08,
+                          ease: easeOut,
                         }
                       : { duration: 0.25 }
                   }
@@ -580,15 +562,12 @@ function BradleyPyramidModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const reduceMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
-  const [animKey, setAnimKey] = useState(0);
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!open) return;
-    setAnimKey((k) => k + 1);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
@@ -663,13 +642,7 @@ function BradleyPyramidModal({
             </div>
 
             <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto px-4 py-5 sm:px-7 sm:py-6">
-              <PyramidChart
-                key={animKey}
-                size="hero"
-                play
-                reduceMotion={reduceMotion}
-                fallIn
-              />
+              <PyramidChart size="hero" play reduceMotion fallIn={false} />
               <p className="mx-auto mt-5 max-w-4xl border-t border-slate-100 pt-4 text-center text-[12px] leading-relaxed text-[color:var(--ink)] sm:text-[13px]">
                 Performance Q2 2026 masih mencatatkan terdapatnya kejadian berakibat ke pekerja yaitu{" "}
                 <strong className="font-semibold text-red-600">2 Medical Treatment Injury</strong> dan{" "}
@@ -679,14 +652,13 @@ function BradleyPyramidModal({
               </p>
             </div>
 
-            <div className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-100 px-5 py-3 sm:px-7">
-              <span className="text-[11px] text-slate-400">Tekan Esc atau klik luar untuk menutup</span>
+            <div className="flex shrink-0 items-center justify-end gap-3 border-t border-slate-100 px-5 py-3 sm:px-7">
               <button
                 type="button"
-                onClick={() => setAnimKey((k) => k + 1)}
+                onClick={onClose}
                 className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-100"
               >
-                Putar ulang animasi
+                Tutup
               </button>
             </div>
           </motion.div>

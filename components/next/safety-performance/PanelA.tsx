@@ -15,25 +15,6 @@ function StackedBars() {
   const max = 14;
   const pct = (v: number) => `${(v / max) * 100}%`;
 
-  /** Per-column timing so bars feel independent, not in lockstep */
-  const colMotion = STACKED.labels.map((_, i) => {
-    const grow = 0.55 + (i % 3) * 0.12;
-    const hold = 0.9 + (i % 2) * 0.35;
-    const shrink = 0.5 + ((i + 1) % 3) * 0.1;
-    const pause = 0.25 + (i % 4) * 0.12;
-    const duration = grow + hold + shrink + pause;
-    const tGrow = grow / duration;
-    const tHold = (grow + hold) / duration;
-    const tShrink = (grow + hold + shrink) / duration;
-    return {
-      duration,
-      delay: i * 0.22 + (i % 2) * 0.08,
-      times: [0, tGrow, tHold, tShrink, 1] as number[],
-      bobDur: 2.4 + (i % 3) * 0.45,
-      bobAmp: i % 2 === 0 ? -3 : -1.5,
-    };
-  });
-
   return (
     <motion.div
       ref={ref}
@@ -51,19 +32,10 @@ function StackedBars() {
               { c: "bg-red-600", t: "Fire" },
               { c: "bg-[color:var(--accent-orange)]", t: "PD" },
             ] as const
-          ).map((leg, li) => (
-            <motion.span
-              key={leg.t}
-              className="inline-flex items-center gap-1"
-              animate={play ? { opacity: [0.5, 1, 0.5] } : { opacity: 1 }}
-              transition={
-                play
-                  ? { duration: 2.6 + li * 0.4, repeat: Infinity, ease: "easeInOut", delay: li * 0.35 }
-                  : undefined
-              }
-            >
+          ).map((leg) => (
+            <span key={leg.t} className="inline-flex items-center gap-1">
               <span className={`h-2 w-2 rounded-sm ${leg.c}`} /> {leg.t}
-            </motion.span>
+            </span>
           ))}
         </div>
       </div>
@@ -73,81 +45,39 @@ function StackedBars() {
           const fire = STACKED.fire[i];
           const pd = STACKED.pd[i];
           const total = STACKED.totals[i];
-          const m = colMotion[i];
           const segments = [
-            { h: nm, color: "bg-slate-400", key: "nm", lag: 0 },
-            { h: fire, color: "bg-red-600", key: "fire", lag: 0.07 },
-            { h: pd, color: "bg-[color:var(--accent-orange)]", key: "pd", lag: 0.14 },
+            { h: nm, color: "bg-slate-400", key: "nm" },
+            { h: fire, color: "bg-red-600", key: "fire" },
+            { h: pd, color: "bg-[color:var(--accent-orange)]", key: "pd" },
           ] as const;
 
           return (
-            <motion.div
-              key={label}
-              className="relative flex flex-1 flex-col items-center justify-end"
-              animate={play ? { y: [0, m.bobAmp, 0] } : { y: 0 }}
-              transition={
-                play
-                  ? {
-                      duration: m.bobDur,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: m.delay * 0.4,
-                    }
-                  : undefined
-              }
-            >
+            <div key={label} className="relative flex flex-1 flex-col items-center justify-end">
               <motion.span
                 className="mb-0.5 text-[9px] font-extrabold text-[color:var(--ink)]"
-                animate={
-                  play
-                    ? { opacity: [0, 1, 1, 0.15, 0], y: [8, 0, 0, -2, 4] }
-                    : inView
-                      ? { opacity: 1, y: 0 }
-                      : { opacity: 0, y: 6 }
-                }
-                transition={
-                  play
-                    ? {
-                        duration: m.duration,
-                        times: m.times,
-                        ease: easeOut,
-                        repeat: Infinity,
-                        delay: m.delay,
-                      }
-                    : { duration: 0.3 }
-                }
+                initial={{ opacity: 0, y: 6 }}
+                animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+                transition={{ duration: 0.3, delay: play ? i * 0.06 : 0, ease: easeOut }}
               >
                 {total.toLocaleString("id-ID", { minimumFractionDigits: 1 })}
               </motion.span>
               <div className="flex h-14 w-full max-w-[36px] flex-col-reverse overflow-hidden rounded-t-md shadow-sm ring-1 ring-black/5">
-                {segments.map((seg) => (
+                {segments.map((seg, si) => (
                   <motion.div
                     key={seg.key}
                     className={`w-full ${seg.color} origin-bottom will-change-[height]`}
                     initial={{ height: "0%" }}
-                    animate={
-                      play
-                        ? { height: ["0%", pct(seg.h), pct(seg.h), "0%", "0%"] }
-                        : inView
-                          ? { height: pct(seg.h) }
-                          : { height: "0%" }
-                    }
-                    transition={
-                      play
-                        ? {
-                            duration: m.duration,
-                            times: m.times,
-                            ease: [0.22, 1, 0.36, 1],
-                            repeat: Infinity,
-                            delay: m.delay + seg.lag,
-                          }
-                        : { duration: 0.55, delay: i * 0.06, ease: easeOut }
-                    }
+                    animate={{ height: inView ? pct(seg.h) : "0%" }}
+                    transition={{
+                      duration: play ? 0.55 : 0.01,
+                      delay: play ? i * 0.06 + si * 0.04 : 0,
+                      ease: easeOut,
+                    }}
                   />
                 ))}
               </div>
               <span className="absolute -bottom-3.5 whitespace-nowrap text-[7px] text-[color:var(--ink-soft)]">{label}</span>
-            </motion.div>
+            </div>
           );
         })}
       </div>
@@ -188,11 +118,11 @@ function SummaryCard({
           animate={
             inView
               ? isGood
-                ? { scale: [1, 1.12, 1] }
-                : { scale: [1, 1.1, 1], boxShadow: ["0 0 0 0 rgba(220,38,38,0.0)", "0 0 0 6px rgba(220,38,38,0.18)", "0 0 0 0 rgba(220,38,38,0.0)"] }
+                ? { scale: 1 }
+                : { scale: 1, boxShadow: "0 0 0 0 rgba(220,38,38,0)" }
               : {}
           }
-          transition={{ delay: delay + 0.35, duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ delay: delay + 0.35, duration: 0.35, ease: easeOut }}
         >
           {isGood ? "+" : "!"}
         </motion.div>

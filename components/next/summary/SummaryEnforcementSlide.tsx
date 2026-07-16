@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import BerauCoalLogo from "../../brand/BerauCoalLogo";
 import { PILLARS, TACTICS } from "../system-defender/tactical/data";
 import { TACTIC_CARDS } from "../safety-performance/data";
-import { ENFORCEMENT, SUMMARY_CARDS, SUMMARY_QUOTE, type SummaryCard } from "./data";
+import { ENFORCEMENT, SUMMARY_CARDS, type SummaryCard } from "./data";
 
 type Props = {
   onBack?: () => void;
@@ -69,22 +69,19 @@ function ThemeIcon({ title }: { title: string }) {
 function MetricDelta({ m }: { m: SummaryCard["metrics"][number] }) {
   if (m.note) {
     return (
-      <div className={`mt-0.5 text-[13px] font-extrabold ${m.bad ? "text-red-600" : "text-[color:var(--ink)]"}`}>
+      <span className={`text-[14px] font-extrabold leading-none ${m.bad ? "text-red-600" : "text-[color:var(--ink)]"}`}>
         {m.note}
-      </div>
+      </span>
     );
   }
   return (
-    <div className="mt-0.5 flex flex-wrap items-baseline gap-1.5 font-heading tabular-nums">
+    <span className="inline-flex items-baseline gap-1 font-heading tabular-nums leading-none">
       <span className="text-[13px] font-semibold text-slate-500">{m.from}</span>
       <span className="text-[11px] text-slate-300">→</span>
-      <span className={`text-[18px] font-extrabold leading-none ${m.bad ? "text-red-600" : "text-[color:var(--green-deep)]"}`}>
+      <span className={`text-[16px] font-extrabold ${m.bad ? "text-red-600" : "text-[color:var(--green-deep)]"}`}>
         {m.to}
       </span>
-      <span className={`text-[10px] font-bold ${m.bad ? "text-red-500" : "text-[color:var(--green-mid)]"}`}>
-        {m.bad ? "↑" : "↑"}
-      </span>
-    </div>
+    </span>
   );
 }
 
@@ -93,52 +90,48 @@ function SummaryRow({ card, delay, reduceMotion }: { card: SummaryCard; delay: n
 
   return (
     <motion.article
-      initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.4, ease: EASE }}
+      transition={{ delay, duration: 0.35, ease: EASE }}
       className="border border-slate-200 bg-white"
     >
-      <header className="flex items-center gap-2.5 border-b border-slate-100 px-3 py-2.5" style={{ borderLeft: `3px solid ${accent}` }}>
+      <header
+        className="flex items-center gap-2 border-b border-slate-100 px-2.5 py-1.5"
+        style={{ borderLeft: `3px solid ${accent}` }}
+      >
         <span
-          className="grid h-7 w-7 place-items-center font-heading text-[12px] font-extrabold text-white"
+          className="grid h-6 w-6 place-items-center font-heading text-[11px] font-extrabold text-white"
           style={{ background: accent }}
         >
           {card.n}
         </span>
-        <span className="text-[color:var(--ink)]" style={{ color: accent }}>
+        <span style={{ color: accent }}>
           <ThemeIcon title={card.title} />
         </span>
-        <h3 className="text-[12px] font-extrabold tracking-[0.08em] text-[color:var(--ink)]">{card.title}</h3>
+        <h3 className="text-[13px] font-extrabold tracking-[0.06em] text-[color:var(--ink)]">{card.title}</h3>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-[0.95fr_1.15fr_0.95fr]">
-        <div className="space-y-2.5 border-b border-slate-100 p-3 md:border-b-0 md:border-r">
-          <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">Metrik Q1 → Q2</p>
+      <div className="grid grid-cols-1 md:grid-cols-[0.9fr_1.2fr]">
+        <div className="space-y-1 border-b border-slate-100 px-2.5 py-1.5 md:border-b-0 md:border-r">
+          <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Metrik Q1 → Q2</p>
           {card.metrics.map((m) => (
-            <div key={m.label}>
-              <div className="text-[10px] font-semibold text-slate-500">{m.label}</div>
+            <div key={m.label} className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0">
+              <span className="text-[12px] font-semibold text-slate-500">{m.label}</span>
               <MetricDelta m={m} />
             </div>
           ))}
         </div>
 
-        <div className="border-b border-slate-100 p-3 md:border-b-0 md:border-r">
-          <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">Catatan</p>
-          <ul className="space-y-2">
+        <div className="px-2.5 py-1.5">
+          <p className="mb-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">Catatan</p>
+          <ul className="space-y-0.5">
             {card.notes.map((n) => (
-              <li key={n} className="flex gap-2 text-[11.5px] leading-snug text-[color:var(--ink)]">
+              <li key={n} className="flex gap-1.5 text-[13px] leading-snug text-[color:var(--ink)]">
                 <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-slate-400" aria-hidden />
                 {n}
               </li>
             ))}
           </ul>
-        </div>
-
-        <div className="p-3">
-          <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.14em] text-red-500/80">Gap</p>
-          <p className="border border-red-200/80 bg-red-50/50 px-2.5 py-2 text-[11.5px] leading-snug text-[color:var(--ink)]">
-            {card.gap}
-          </p>
         </div>
       </div>
     </motion.article>
@@ -163,31 +156,31 @@ function EnforcementBlock({
 
   return (
     <motion.article
-      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.45, ease: EASE }}
+      transition={{ delay, duration: 0.4, ease: EASE }}
       className="border border-slate-200 bg-white"
     >
       <header
-        className="flex items-center justify-between gap-3 px-3.5 py-3 text-white"
+        className="flex items-center justify-between gap-2 px-3 py-2 text-white"
         style={{ background: accent }}
       >
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center bg-white/15">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="grid h-7 w-7 shrink-0 place-items-center bg-white/15">
             {tone === "green" ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 <path d="m9 12 2 2 4-4" />
               </svg>
             ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
                 <path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z" />
               </svg>
             )}
           </span>
-          <div>
-            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/70">Enforcement</p>
-            <h3 className="font-heading text-[14px] font-extrabold tracking-wide">{title}</h3>
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/70">Enforcement</p>
+            <h3 className="font-heading text-[16px] font-extrabold leading-tight tracking-wide">{title}</h3>
           </div>
         </div>
         <span className="font-heading text-[22px] font-black leading-none text-white/25">{items.length}</span>
@@ -197,18 +190,18 @@ function EnforcementBlock({
         {items.map((item, i) => (
           <motion.li
             key={item}
-            initial={reduceMotion ? false : { opacity: 0, x: 8 }}
+            initial={reduceMotion ? false : { opacity: 0, x: 6 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: delay + 0.05 + i * 0.04, duration: 0.3 }}
-            className="flex gap-3 px-3.5 py-2.5"
+            transition={{ delay: delay + 0.03 + i * 0.03, duration: 0.25 }}
+            className="flex gap-2.5 px-3 py-2"
           >
             <span
-              className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center text-[10px] font-extrabold text-white"
+              className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center text-[12px] font-extrabold text-white"
               style={{ background: accent }}
             >
               {i + 1}
             </span>
-            <span className="text-[12px] leading-snug text-[color:var(--ink)]">{item}</span>
+            <span className="text-[15px] leading-snug text-[color:var(--ink)]">{item}</span>
           </motion.li>
         ))}
       </ol>
@@ -334,15 +327,6 @@ export default function SummaryEnforcementSlide({ onBack }: Props) {
               </motion.span>
             </div>
           </div>
-
-          <motion.p
-            className="mt-6 max-w-4xl border-l-2 border-[color:var(--green-mid)] pl-4 font-body text-[13px] leading-[1.7] text-[color:var(--ink)] md:text-[14px]"
-            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55, duration: 0.45, ease: EASE }}
-          >
-            {SUMMARY_QUOTE}
-          </motion.p>
         </header>
 
         <div className="mt-7 flex items-center justify-between gap-3">
@@ -410,18 +394,18 @@ export default function SummaryEnforcementSlide({ onBack }: Props) {
           <main className="min-w-0 flex-1">
             <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.08fr_0.92fr]">
               <section>
-                <div className="mb-3 flex items-end justify-between gap-3 border-b border-slate-200 pb-2">
+                <div className="mb-1.5 flex items-end justify-between gap-3 border-b border-slate-200 pb-1">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Lagging &amp; Leading</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Lagging &amp; Leading</p>
                     <h2 className="font-heading text-[15px] font-extrabold text-[color:var(--ink)] md:text-base">
                       Highlight Summary
                     </h2>
                   </div>
-                  <span className="text-[11px] font-semibold text-[color:var(--ink-soft)]">
+                  <span className="text-[12px] font-semibold text-[color:var(--ink-soft)]">
                     {SUMMARY_CARDS.length} pilar
                   </span>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-1.5">
                   {SUMMARY_CARDS.map((card, i) => (
                     <SummaryRow
                       key={card.title}
@@ -434,18 +418,18 @@ export default function SummaryEnforcementSlide({ onBack }: Props) {
               </section>
 
               <section>
-                <div className="mb-3 flex items-end justify-between gap-3 border-b border-slate-200 pb-2">
+                <div className="mb-1.5 flex items-end justify-between gap-3 border-b border-slate-200 pb-1">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Tindak lanjut</p>
-                    <h2 className="font-heading text-[15px] font-extrabold text-[color:var(--ink)] md:text-base">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">Tindak lanjut</p>
+                    <h2 className="font-heading text-[18px] font-extrabold text-[color:var(--ink)] md:text-xl">
                       Enforcement
                     </h2>
                   </div>
-                  <span className="text-[11px] font-semibold text-[color:var(--ink-soft)]">
+                  <span className="text-[13px] font-semibold text-[color:var(--ink-soft)]">
                     Stability · Transform
                   </span>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-1.5">
                   <EnforcementBlock
                     title={ENFORCEMENT.stability.title}
                     tone="green"

@@ -252,7 +252,7 @@ export const GAP_MATRIX: GapPillar[] = [
       },
       {
         metric: "Golden Time < 100%",
-        gaps: [false, false, false, false, false, true, false, true, false],
+        gaps: [false, false, false, false, false, true, true, true, false],
       },
     ],
   },

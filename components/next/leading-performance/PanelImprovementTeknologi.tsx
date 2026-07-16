@@ -21,6 +21,12 @@ const PANELS = [
   },
 ] as const;
 
+const BEARC_NOTE =
+  "Kontrol Peran sudah dijalankan untuk membantu meningkatkan partisipasi pekerja dalam rangka peningkatan performance Leading. Implementasi yang sudah berjalan sejak Week 27 pada Tim Safety & HSE baik di BC maupun Mitra Kerja berdampak pada peningkatan partisipasi pelaporan SAP & TBC.";
+
+const RULE_NOTE =
+  "Rule-based performance control hadir untuk mendeteksi deviasi lebih dini, memastikan tindak lanjut terukur, dan mencegah gap berkembang menjadi insiden.";
+
 type DemoPhase = "idle" | "loading" | "modal";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -136,6 +142,11 @@ export default function PanelImprovementTeknologi() {
                   className="mx-auto h-auto max-h-[520px] w-full object-contain"
                 />
               </div>
+              {(p.id === "bearc" || p.id === "rule") && (
+                <p className="border-t border-slate-100 bg-slate-50/80 px-3 py-2.5 text-[11px] leading-relaxed text-[color:var(--ink)] md:px-4 md:text-[12px]">
+                  {p.id === "bearc" ? BEARC_NOTE : RULE_NOTE}
+                </p>
+              )}
             </motion.figure>
           ))}
         </div>

@@ -1,6 +1,3 @@
-export const SUMMARY_QUOTE =
-  "Highlight Summary Lagging & Leading menjadi baseline untuk Enforcement: menjaga Stability operasi yang sudah berjalan, sekaligus Transform gap kritis agar tidak berkembang menjadi insiden.";
-
 export type SummaryTone = "green" | "blue";
 
 export type SummaryMetric = {
@@ -17,7 +14,6 @@ export type SummaryCard = {
   tone: SummaryTone;
   metrics: SummaryMetric[];
   notes: string[];
-  gap: string;
 };
 
 export const SUMMARY_CARDS: SummaryCard[] = [
@@ -33,7 +29,6 @@ export const SUMMARY_CARDS: SummaryCard[] = [
       "Pemenuhan rasio minimal weekly belum konsisten di seluruh mitra kerja.",
       "Perlu penekanan efektifitas pengawasan supervisor.",
     ],
-    gap: "SAP & TBC membaik, namun konsistensi pencapaian target masih menjadi fokus.",
   },
   {
     n: 2,
@@ -48,7 +43,6 @@ export const SUMMARY_CARDS: SummaryCard[] = [
       "Isu kritis: seatbelt, HP, dan perilaku kerja kritis masih menonjol.",
       "Perulangan pelanggaran masih terjadi di mitra kerja spesifik.",
     ],
-    gap: "Perilaku kritis dan kepatuhan pekerja masih perlu diperkuat.",
   },
   {
     n: 3,
@@ -63,7 +57,6 @@ export const SUMMARY_CARDS: SummaryCard[] = [
       "Fatigue management, work planning, dan emergency awareness belum stabil.",
       "Disiplin proses dan kesiapan kerja masih menjadi gap.",
     ],
-    gap: "Disiplin proses, readiness, dan pelaporan emergency perlu diperkuat.",
   },
   {
     n: 4,
@@ -77,7 +70,6 @@ export const SUMMARY_CARDS: SummaryCard[] = [
       "Konfigurasi DMS dan coverage/reliabilitas CCTV belum optimal.",
       "Early detection berbasis teknologi belum sepenuhnya efektif.",
     ],
-    gap: "DMS dan CCTV belum cukup efektif sebagai kontrol deteksi dini.",
   },
 ];
 
